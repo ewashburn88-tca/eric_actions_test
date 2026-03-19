@@ -1,0 +1,43 @@
+qwreporting.double_scroll:
+  version: VERSION
+  js:
+    js/jquery.DoubleScroll.js: {attributes: { defer: true, async: true }, preprocess: false, minified: false}
+
+horizontal_scroller:
+  version: 'VERSION'
+  js:
+    js/horizontal_scroller.js: { attributes: { defer: true, async: true }, preprocess: false, minified: true }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/jquery.once
+    - qwreporting/qwreporting.double_scroll
+
+qwreporting.individual_results_drag_scrolling:
+  version: VERSION
+  js:
+    js/individual_results_drag_scrolling.js: {attributes: { defer: true, async: true }, preprocess: false, minified: false}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.ajax
+    - core/jquery.once
+    - qwreporting/horizontal_scroller
+
+qwreporting.jscrollpane:
+  version: VERSION
+  js:
+    //cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.2.2/script/jquery.jscrollpane.min.js: { type: external }
+    //cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.2.2/script/jquery.jscrollpane.js: { type: external }
+  css:
+    theme:
+      css/jquery.jscrollpane.min.css: {}
+
+qwreporting.group_email:
+  version: VERSION
+  css:
+    theme:
+      assets/css/qwizard.qwiz_group_email.theme.css: {}

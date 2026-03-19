@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Courses
+vid: courses
+description: 'Membership Courses'
+weight: 0

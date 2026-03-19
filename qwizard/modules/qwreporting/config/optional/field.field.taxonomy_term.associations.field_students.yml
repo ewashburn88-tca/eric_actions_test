@@ -1,0 +1,30 @@
+uuid: 62432034-fb27-44d6-b717-f7469845d8c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_students
+    - taxonomy.vocabulary.associations
+  module:
+    - bricks
+id: taxonomy_term.associations.field_students
+field_name: field_students
+entity_type: taxonomy_term
+bundle: associations
+label: Students
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: true
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: bricks

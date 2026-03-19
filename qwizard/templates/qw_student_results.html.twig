@@ -1,0 +1,22 @@
+{#
+/**
+ * @file qw_student_results.html.twig
+ * Default theme implementation to present Student Results data.
+ *
+ * This template is used when viewing Student Results pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_qw_student_results()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('qw_student_results') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

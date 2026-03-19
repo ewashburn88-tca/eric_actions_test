@@ -1,0 +1,10 @@
+entity.school.add_form:
+  route_name: entity.school.add_page
+  title: 'Add School'
+  appears_on:
+    - entity.school.collection
+entity.school_type.add_form:
+  route_name: entity.school_type.add_form
+  title: 'Add School type'
+  appears_on:
+    - entity.school_type.collection

@@ -1,0 +1,3 @@
+services:
+  qwsimplechoice.presave_service:
+    class: 'Drupal\qwsimplechoice\QWSimpleChoicePresaveService'

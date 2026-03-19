@@ -1,0 +1,40 @@
+
+qwsimplechoice.qwsimplechoice_config_form:
+  path: '/admin/qwizard/config/qwsimplechoiceconfig'
+  defaults:
+    _form: '\Drupal\qwsimplechoice\Form\QwsimplechoiceConfigForm'
+    _title: 'QwsimplechoiceConfigForm'
+  requirements:
+    _permission: 'administer qwsimplechoice'
+  options:
+    _admin_route: TRUE
+
+qwsimplechoice.question_form:
+  path: '/qwsimplechoice/question/{question}'
+  defaults:
+    _form: '\Drupal\qwsimplechoice\Form\QuestionForm'
+    _title: 'QuestionForm'
+  requirements:
+    _permission: 'view qwsimplechoice questions'
+  options:
+    parameters:
+      question:
+        type: entity:node
+
+qwsimplechoice.sc_take_form:
+  path: '/simple-choice-take/{qwiz}/{length}/{qwiz_status}'
+  defaults:
+    _form: '\Drupal\qwsimplechoice\Form\SCTakeForm'
+    _title: 'SCTakeForm'
+    qwiz_status: 'start'
+  requirements:
+    _access: 'TRUE'
+  options:
+    parameters:
+      qwiz:
+        type: entity:qwiz
+      length:
+        type: integer
+      qwiz_status:
+        type: string
+

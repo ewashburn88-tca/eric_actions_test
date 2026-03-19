@@ -1,0 +1,305 @@
+<?php
+
+/**
+ * @file
+ * Contains qwizard.module.
+ */
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwizard_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the qwizard module.
+    case 'help.page.qwizard':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Module to create, administer and track quizzes and quiz results.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function qwizard_theme() {
+  $theme = [];
+  $theme['qwpool'] = [
+    'render element' => 'elements',
+    'file' => 'qwpool.page.inc',
+    'template' => 'qwpool',
+  ];
+  $theme['qwpool_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'qwpool.page.inc',
+  ];
+  $theme['qwiz'] = [
+    'render element' => 'elements',
+    'file' => 'qwiz.page.inc',
+    'template' => 'qwiz',
+  ];
+  $theme['qwiz_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'qwiz.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+* Implements hook_theme_suggestions_HOOK().
+*/
+function qwizard_theme_suggestions_qwpool(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#qwpool'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'qwpool__' . $sanitized_view_mode;
+  $suggestions[] = 'qwpool__' . $entity->bundle();
+  $suggestions[] = 'qwpool__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'qwpool__' . $entity->id();
+  $suggestions[] = 'qwpool__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+* Implements hook_theme_suggestions_HOOK().
+*/
+function qwizard_theme_suggestions_qwiz(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#qwiz'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'qwiz__' . $sanitized_view_mode;
+  $suggestions[] = 'qwiz__' . $entity->bundle();
+  $suggestions[] = 'qwiz__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'qwiz__' . $entity->id();
+  $suggestions[] = 'qwiz__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function qwizard_element_info_alter(array &$types) {
+  // Attach our extra CSS for toolbar icons.
+  if (isset($types['toolbar'])) {
+    $types['toolbar']['#attached']['library'][] = 'qwizard/toolbar';
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function qwizard_entity_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityType()->id() == 'user') {
+    $result = \Drupal::entityQuery("qwpool")
+      ->condition('user_id', $entity->id(), '=')
+      ->execute();
+    if (!empty($result)) {
+      $qwpool_storage_handler = \Drupal::entityTypeManager()
+        ->getStorage("qwpool");
+      $qwpools                = $qwpool_storage_handler->loadMultiple($result);
+      $qwpool_storage_handler->delete($qwpools);
+    }
+
+    $result = \Drupal::entityQuery("qw_student_results")
+      ->condition('user_id', $entity->id(), '=')
+      ->execute();
+
+    if (!empty($result)) {
+      $qw_student_result_storage_handler = \Drupal::entityTypeManager()
+        ->getStorage("qw_student_results");
+      $qw_student_results                = $qw_student_result_storage_handler->loadMultiple($result);
+      $qw_student_result_storage_handler->delete($qw_student_results);
+    }
+
+    $result = \Drupal::entityQuery("qwiz_result")
+      ->condition('user_id', $entity->id(), '=')
+      ->execute();
+
+    if (!empty($result)) {
+      $qwiz_result_storage_handler = \Drupal::entityTypeManager()
+        ->getStorage("qwiz_result");
+      $qwiz_results                = $qwiz_result_storage_handler->loadMultiple($result);
+      $qwiz_result_storage_handler->delete($qwiz_results);
+    }
+  }
+}
+
+function qwizard_entity_presave(\Drupal\Core\Entity\EntityInterface $entity){
+  $node_types_to_affect = ['qw_simple_choice', 'qw_flashcard'];
+  if ($entity->getEntityType()->id() == 'node' && in_array($entity->bundle(), $node_types_to_affect) && $entity->hasField('field_specified_topics')) {
+    // Make sure data in field_classes, field_courses, and field_topics matches paragraphs in field_specified_topics
+    // First get a flat array of tags from paragraphs
+    $specified_topics = $entity->get('field_specified_topics')->referencedEntities();
+    $specified_tags = ['courses' => [], 'classes' => [], 'topics' => []];
+    if (!empty($specified_topics)) {
+      foreach ($specified_topics as $specified_topic) {
+        if (!empty($specified_topic->get('field_course')->getValue())) {
+          $tag_id = $specified_topic->get('field_course')->getValue()[0]['target_id'];
+          $specified_tags['courses'][$tag_id]['target_id'] = $tag_id;
+        }
+        if (!empty($specified_topic->get('field_class')->getValue())) {
+          $tag_id = $specified_topic->get('field_class')->getValue()[0]['target_id'];
+          $specified_tags['classes'][$tag_id]['target_id']  = $tag_id;
+        }
+        if (!empty($specified_topic->get('field_topic')->getValue())) {
+          $tag_id = $specified_topic->get('field_topic')->getValue()[0]['target_id'];
+          $specified_tags['topics'][$tag_id]['target_id']  = $tag_id;
+        }
+      }
+    }
+
+    $entity->set('field_courses', $specified_tags['courses']);
+    $entity->set('field_classes', $specified_tags['classes']);
+    $entity->set('field_topics', $specified_tags['topics']);
+
+    // Also prevent any relative URLs
+    $QuestionTransformTextService = \Drupal::service('qwizard.question_transform_text');
+    $entity_array = $entity->toArray();
+    foreach($entity_array as $field_name=>$field_data) {
+      if (is_array($field_data) && (str_starts_with($field_name, 'field_')) && !empty($field_data[0]['value'])) {
+        $valid = false;
+        $field_data = $entity->get($field_name)->getValue();
+        foreach ($field_data as $key => $values) {
+          if (is_array($values) && !empty($values['value'])) {
+            $field_data[$key]['value'] = $QuestionTransformTextService->transformRootRelativeUrlsToAbsolute($values['value']);
+            $valid = true;
+          }
+        }
+        if($valid) {
+          #dpm($field_data);
+          $entity->set($field_name, $field_data);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Tag for random sort entityQuery.
+ *
+ * @param \Drupal\Core\Database\Query\AlterableInterface $query
+ */
+function qwizard_query_sort_by_random_alter(\Drupal\Core\Database\Query\AlterableInterface $query) {
+  $query->orderRandom();
+}
+
+/**
+ * Implements hook_cron().
+ */
+function qwizard_cron()
+{
+  $QwCache = \Drupal::service('qwizard.cache');
+  $QwCache->generateAllQwCacheQueue();
+
+    /*
+     * Pre 9-30-2022 cron for generating others results
+     * Changed into QWCache queue above.
+     *
+     * $statics = new \Drupal\qwizard\SiteResults();
+    $courses = \Drupal\qwizard\\Drupal::service('qwizard.coursehandler')->getActiveCourses();
+    try {
+    // @todo use something like QwizardGeneral::estimateLengthFromDates(QwizardGeneral::getDateTime('+'.str($max_term).' days'), strtotime('now'));
+    $date = new DrupalDateTime('now');
+    $date->setTimezone(new \DateTimezone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $today = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+
+    $date = new DrupalDateTime('1 month ago');
+    $date->setTimezone(new \DateTimezone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $month = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+
+    $date = new DrupalDateTime('1 week ago');
+    $date->setTimezone(new \DateTimezone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $week = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+
+    $date = new DrupalDateTime('1 day ago');
+    $date->setTimezone(new \DateTimezone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $day = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+
+    foreach($courses as $key => $value) {
+      if($key > 0 ){
+        $statics->getResultsForCourses($key, 'month',true, $today, $month);
+        $statics->getResultsForCourses($key, 'week', true, $today, $week);
+        $statics->getResultsForCourses($key, 'day', true, $today, $day);
+      }
+    }
+  }
+  catch (\Throwable $e) {
+    Drupal::logger("qwizard")->warning('Cron Error - '.$e->getMessage().' | '.$e->getTraceAsString());
+  }*/
+
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function qwizard_user_login($account) {
+  $config = \Drupal::config('qwizard.qwizardsettings');
+  if ($config->get('rebuild_mode') == TRUE) {
+
+  }
+}
+
+/**
+ * Determines if debug mode is on.
+ *
+ * @return bool
+ */
+function qwizard_in_debug_mode() {
+  $config = \Drupal::config('qwizard.qwizardsettings');
+  return !empty($config->get('debug_mode'));
+}
+
+
+/**
+ * Taken from
+ * https://stackoverflow.com/questions/6329211/php-array-intersect-efficiency
+ * Is ~10x faster than built in PHP array intersect
+ *
+ * @param $arrayOne
+ * @param $arrayTwo
+ * @return int[]|string[]
+ */
+function fasterArrayIntersect($arrayOne, $arrayTwo, $arrayThree = []) {
+  $index = array_flip($arrayOne);
+  $second = array_flip($arrayTwo);
+
+  if(!empty($arrayThree)){
+    $third = array_flip($arrayThree);
+    $x = array_intersect_key($index, $second, $third);
+  }else{
+    $x = array_intersect_key($index, $second);
+  }
+
+
+  return array_flip($x);
+}
+
+/**
+ * Taken from
+ * https://stackoverflow.com/questions/2142120/php-encoding-with-domdocument
+ * Helps avoid encoding errors down the line when loading a DomDocument
+ */
+function _qwizard_LoadDomDocument($string){
+  $dom_document = new \DOMDocument('1.0', 'UTF-8');
+  $dom_document->substituteEntities = TRUE;
+  @$dom_document->loadHTML(mb_convert_encoding($string, 'HTML-ENTITIES', 'UTF-8'));
+  //@$dom_document->loadHTML($string);
+
+  return $dom_document;
+}

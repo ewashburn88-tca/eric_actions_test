@@ -1,0 +1,8 @@
+inactive_threshold: '12/31/2023'
+enable_cron_archival: false
+cron_batch_size: 50
+storage_plugin: local_storage
+plugin_configuration:
+  local_storage:
+    file_scheme: private
+    directory: qwarchive

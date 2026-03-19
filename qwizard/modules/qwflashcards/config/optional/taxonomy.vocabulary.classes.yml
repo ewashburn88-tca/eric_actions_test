@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Classes
+vid: classes
+description: 'Classes are a categorization under Courses'
+weight: -9

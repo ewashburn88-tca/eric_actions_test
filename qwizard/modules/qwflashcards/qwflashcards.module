@@ -1,0 +1,27 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+
+function qwflashcards_form_node_form_alter(&$form, FormStateInterface $form_state) {
+    if($form['#form_id'] === 'node_qw_flashcard_form') {
+        $form['#validate'][] = 'qwflashcards_form_validate';
+    }
+}
+
+function qwflashcards_form_validate(&$form, FormStateInterface $form_state) {
+    if ($form_state::hasAnyErrors()) {
+        $form_errors = $form_state->getErrors();
+        if($form_errors['field_answer_correct][0']) {
+            $form_state->clearErrors();
+            unset($form_errors['field_answer_correct][0']);
+    
+            foreach ($form_errors as $name => $error_message) {
+                $form_state->setErrorByName($name, $error_message);
+            }
+
+            $values = $form_state->getValues();
+            $values['field_answer_correct'][0]['aid'] = 1;
+            $form_state->setValues($values);
+        }
+    }
+}

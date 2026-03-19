@@ -1,0 +1,16 @@
+qwizard.qwpool_type.*:
+  type: config_entity
+  label: 'Question Pool type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    defaultDecrement:
+      type: integer
+      label: 'Decrement'
+      translatable: false
+    uuid:
+      type: string

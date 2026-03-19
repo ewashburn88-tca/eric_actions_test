@@ -1,0 +1,27 @@
+uuid: b4c1b8da-bbe0-42b9-92b2-931d14253430
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_tester_theme
+    - profile.type.qwizard_profile
+  module:
+    - options
+    - profile
+third_party_settings:
+  profile:
+    profile_private: true
+id: profile.qwizard_profile.field_tester_theme
+field_name: field_tester_theme
+entity_type: profile
+bundle: qwizard_profile
+label: 'Choose your tester theme'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: Light
+default_value_callback: ''
+settings: {  }
+field_type: list_string

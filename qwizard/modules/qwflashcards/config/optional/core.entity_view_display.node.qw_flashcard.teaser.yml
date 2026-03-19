@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.qw_flashcard.field_answer_correct
+    - field.field.node.qw_flashcard.field_classes
+    - field.field.node.qw_flashcard.field_courses
+    - field.field.node.qw_flashcard.field_question
+    - field.field.node.qw_flashcard.field_reference
+    - field.field.node.qw_flashcard.field_topics
+    - node.type.qw_flashcard
+  module:
+    - user
+id: node.qw_flashcard.teaser
+targetEntityType: node
+bundle: qw_flashcard
+mode: teaser
+content:
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_answer_correct: true
+  field_classes: true
+  field_courses: true
+  field_question: true
+  field_reference: true
+  field_topics: true

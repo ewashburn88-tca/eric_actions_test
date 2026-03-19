@@ -1,0 +1,28 @@
+services:
+  plugin.manager.qwarchive_storage:
+    class: Drupal\qwarchive\Plugin\QwArchiveStoragePluginManager
+    parent: default_plugin_manager
+
+  qwarchive.record_manager:
+    class: Drupal\qwarchive\QwArchiveRecordManager
+    arguments: ['@database', '@entity_type.manager', '@datetime.time', '@logger.factory', '@qwarchive.data_mapper']
+
+  qwarchive.storage_manager:
+    class: Drupal\qwarchive\QwArchiveStorageManager
+    arguments: ['@plugin.manager.qwarchive_storage', '@config.factory', '@logger.factory']
+
+  qwarchive.manager:
+    class: Drupal\qwarchive\QwArchiveManager
+    arguments: ['@entity_type.manager', '@database', '@module_handler', '@file_system', '@qwizard.student_results_handler', '@qwsubs.subscription_handler', '@qwarchive.record_manager', '@qwarchive.storage_manager']
+
+  qwarchive.data_mapper:
+    class: Drupal\qwarchive\QwArchiveDataMapper
+    arguments: ['@database']
+
+  qwarchive.restore_manager:
+    class: Drupal\qwarchive\QwArchiveRestoreManager
+    arguments: ['@entity_type.manager', '@qwarchive.record_manager', '@qwarchive.storage_manager', '@qwarchive.data_mapper']
+
+  qwarchive.user_manager:
+    class: Drupal\qwarchive\QwArchiveUserManager
+    arguments: ['@entity_type.manager', '@database']

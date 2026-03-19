@@ -1,0 +1,8 @@
+name: QWizard Admin (qwadmin)
+type: module
+description: Admin utilities for QWizard, including Views result post-processing.
+core_version_requirement: ^9 || ^10
+package: QWizard
+dependencies:
+  - drupal:views
+  - qwizard:qwizard

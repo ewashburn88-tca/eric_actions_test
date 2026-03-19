@@ -1,0 +1,5 @@
+qwsimplechoice:
+  feedback_correct_response: "Correct"
+  feedback_incorrect_response: "Wrong"
+  answer_correct_suffix: "You chose this answer correctly!"
+  answer_incorrect_suffix: "You chose this incorrect answer."

@@ -1,0 +1,8 @@
+name: qwmarked
+type: module
+description: 'Provides a marked_question entity.'
+package: Zuku
+core_version_requirement: ^9.2
+dependencies:
+  - drupal:text
+configure: entity.marked_question.settings

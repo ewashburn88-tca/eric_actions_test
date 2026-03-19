@@ -1,0 +1,7 @@
+name: Qwizard Archive
+type: module
+description: Provides archiving of user result data to files.
+package: Education
+core_version_requirement: ^9 || ^10
+dependencies:
+  - qwizard:qwizard

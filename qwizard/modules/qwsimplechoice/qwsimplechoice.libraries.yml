@@ -1,0 +1,11 @@
+question_form:
+  version: VERSION
+  css:
+    state:
+      css/qwsimplechoice.question_form.state.css: {}
+    layout:
+      css/qwsimplechoice.question_form.layout.css: {}
+    theme:
+      css/qwsimplechoice.question_form.theme.css: {}
+  js:
+    js/qwsimplechoice.question_form.js: {}

@@ -1,0 +1,84 @@
+# Question Pool routing definition
+
+entity.qwpool.canonical:
+  route_name: entity.qwpool.canonical
+  base_route: entity.qwpool.canonical
+  title: 'View'
+
+entity.qwpool.edit_form:
+  route_name: entity.qwpool.edit_form
+  base_route: entity.qwpool.canonical
+  title: 'Edit'
+
+entity.qwpool.version_history:
+  route_name: entity.qwpool.version_history
+  base_route: entity.qwpool.canonical
+  title: 'Revisions'
+
+entity.qwpool.delete_form:
+  route_name:  entity.qwpool.delete_form
+  base_route:  entity.qwpool.canonical
+  title: Delete
+  weight: 10
+
+# Quiz routing definition
+
+entity.qwiz.canonical:
+  route_name: entity.qwiz.canonical
+  base_route: entity.qwiz.canonical
+  title: 'View'
+
+entity.qwiz.edit_form:
+  route_name: entity.qwiz.edit_form
+  base_route: entity.qwiz.canonical
+  title: 'Edit'
+
+entity.qwiz.version_history:
+  route_name: entity.qwiz.version_history
+  base_route: entity.qwiz.canonical
+  title: 'Revisions'
+
+entity.qwiz.delete_form:
+  route_name:  entity.qwiz.delete_form
+  base_route:  entity.qwiz.canonical
+  title: Delete
+  weight: 10
+
+# Quiz Results routing definition
+qwiz_result.settings_tab:
+  route_name: qwiz_result.settings
+  title: 'Settings'
+  base_route: qwiz_result.settings
+
+entity.qwiz_result.canonical:
+  route_name: entity.qwiz_result.canonical
+  base_route: entity.qwiz_result.canonical
+  title: 'View'
+
+entity.qwiz_result.edit_form:
+  route_name: entity.qwiz_result.edit_form
+  base_route: entity.qwiz_result.canonical
+  title: 'Edit'
+
+entity.qwiz_result.delete_form:
+  route_name:  entity.qwiz_result.delete_form
+  base_route:  entity.qwiz_result.canonical
+  title: Delete
+  weight: 10
+
+# Student Results routing definition
+entity.qw_student_results.canonical:
+  route_name: entity.qw_student_results.canonical
+  base_route: entity.qw_student_results.canonical
+  title: 'View'
+
+entity.qw_student_results.edit_form:
+  route_name: entity.qw_student_results.edit_form
+  base_route: entity.qw_student_results.canonical
+  title: 'Edit'
+
+entity.qw_student_results.delete_form:
+  route_name:  entity.qw_student_results.delete_form
+  base_route:  entity.qw_student_results.canonical
+  title: Delete
+  weight: 10

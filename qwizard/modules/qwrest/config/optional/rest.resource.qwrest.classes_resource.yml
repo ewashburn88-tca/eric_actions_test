@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - basic_auth
+    - hal
+    - qwizard
+    - user
+id: classes_resource
+plugin_id: classes_resource
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - hal_json
+    - json
+  authentication:
+    - basic_auth
+    - cookie

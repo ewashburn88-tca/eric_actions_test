@@ -1,0 +1,25 @@
+uuid: 21f85798-85e8-4a03-ae38-1694ef935b16
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_completion_date
+    - profile.type.qwizard_profile
+  module:
+    - datetime
+    - profile
+third_party_settings:
+  profile:
+    profile_private: true
+id: profile.qwizard_profile.field_completion_date
+field_name: field_completion_date
+entity_type: profile
+bundle: qwizard_profile
+label: 'Completion Goal Date'
+description: 'The date a student chooses to complete the course.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

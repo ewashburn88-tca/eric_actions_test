@@ -1,0 +1,107 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display something.
+ *
+ * Available variables:
+ * - foo: Foo variable description.
+ *
+ * @see template_preprocess_qwreporting_homepage()
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="wrapper-class">
+  {% if is_admin %}
+    <a href='{{ url('qwreporting.group_new') }}'>{{ 'Add new Group'|t }}</a>
+    <br/>
+  {% endif %}
+  {#  Commenting out until better use of schools is adopted.
+    {% if not school  %}
+        <p>{{ 'You are not assigned to any schools yet.'|t }}</p>
+    {% endif %}
+  #}
+
+  <h3>{{ 'Below is a list of student groups you have access to review'|t }}</h3>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>{{ 'Student Group'|t }}</th>
+      <th>{{ 'Actions'|t }}</th>
+    </tr>
+    </thead>
+    {% for group in groups %}
+      {% if not group.archived %}
+        <tr>
+          {# <td><a href="{{ url('qwreporting.results.individual', {'group' : group.id}) }}">{{ group.name|e }}</a></td> #}
+          <td>{{ group.name|e }}</td>
+          <td>
+            <a
+              href="{{ url('qwreporting.results.individual', {'group' : group.id}) }}">{{ 'Group Results'|t }}</a>
+            <!--  | TODO Whole class Results -->
+            {% if is_admin %}
+              <span style="font-size:1.5rem;color:black;">|</span>
+              <a
+                href="{{ url('qwreporting.group_edit', {'group' : group.id}) }}">{{ 'Edit Group'|t }}</a>
+              <span style="font-size:1.5rem;color:black;">|</span>
+              <a
+              href="{{ url('qwreporting.archive_group', {'group' : group.id}) }}">{{ 'Archive'|t }}</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+</div>
+
+<div class="fr-archived-groups border border-primary px-2 pb-2 mb-2">
+
+  <div id="accordion">
+    <div class="fr-archived-header" id="fr-archived-groups-heading">
+      <h3 class="m-0 mt-2">
+        <button class="btn btn-link m-0 p-0 d-block collapsed" data-toggle="collapse" data-target="#fr-archived-groups-collapse" aria-expanded="false" aria-controls="fr-archived-groups-collapse">{{ 'Archived Groups'|t }}</button>
+      </h3>
+    </div>
+    <div id="fr-archived-groups-collapse" class="collapse" aria-labelledby="fr-archived-groups-heading" data-parent="#accordion">
+      <div class="fr-archived-body">
+        {% set found_archived = false %}
+        <table class="table">
+          <thead>
+          <tr>
+            <th>{{ 'Student Group'|t }}</th>
+            <th>{{ 'Actions'|t }}</th>
+          </tr>
+          </thead>
+          {% for group in groups %}
+            {% if group.archived %}
+              {% set found_archived = true %}
+              <tr>
+                {# <td><a href="{{ url('qwreporting.results.individual', {'group' : group.id}) }}">{{ group.name|e }}</a></td> #}
+                <td>{{ group.name|e }}</td>
+                <td>
+                  <a
+                    href="{{ url('qwreporting.results.individual', {'group' : group.id}) }}">{{ 'Group Results'|t }}</a>
+                  <!--  | TODO Whole class Results -->
+                  {% if is_admin %}
+                    <span style="font-size:1.5rem;color:black;">|</span>
+                    <a
+                      href="{{ url('qwreporting.group_edit', {'group' : group.id}) }}">{{ 'Edit Group'|t }}</a>
+                    <span style="font-size:1.5rem;color:black;">|</span>
+                    <a
+                      href="{{ url('qwreporting.restore_group', {'group' : group.id}) }}">{{ 'Restore'|t }}</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+          {% if not found_archived %}
+            <tr>
+              <td colspan="2"><p><em>{{ 'No archived groups found.'|t }}</em></p></td>
+            </tr>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

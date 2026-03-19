@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Editor Quiz Tags'
+vid: editor_qwiz_tags
+description: 'Tags used by editors to help search/filter quizzes or questions.'
+hierarchy: 0
+weight: 0

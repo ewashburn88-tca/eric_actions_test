@@ -1,0 +1,16 @@
+.archive-font-small {
+  font-size: 80%;
+}
+
+.archive-icon {
+  position: relative;
+  top: 4px;
+  margin: 0 4px;
+}
+
+.qw-restore-link {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 2px;
+  padding: 0 2px;
+}

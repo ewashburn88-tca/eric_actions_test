@@ -1,0 +1,10 @@
+services:
+  qwrest.general:
+    class: Drupal\qwrest\QwRestGeneral
+    arguments: []
+  qwrest.results:
+    class: Drupal\qwrest\QwRestResults
+    arguments: [ ]
+  qwrest.contact:
+    class: Drupal\qwrest\QwRestContact
+    arguments: ['@qwizard.general', '@qwrest.general', '@qwizard.coursehandler', '@mobile_detect']

@@ -1,0 +1,413 @@
+<?php
+use Drupal\Core\Database\Database;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\Entity\User;
+
+/**
+ * @file
+ * Contains qwizard.install.
+ *
+ * Install and update function for the qwizard module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function qwizard_install() {
+  $voc = ['classes' => 'Classes', 'courses' => 'Courses'];
+  $vocabularies = \Drupal\taxonomy\Entity\Vocabulary::loadMultiple();
+  foreach ($voc as $vid => $name) {
+    if (!isset($vocabularies[$vid])) {
+      $vocabulary = \Drupal\taxonomy\Entity\Vocabulary::create([
+        'vid'         => $vid,
+        'description' => '',
+        'name'        => $name,
+      ]);
+      $vocabulary->save();
+    }
+  }
+}
+
+/**
+ * Update 8001 - Changes subscription name length in DB config
+ * https://evolvingweb.ca/blog/resizing-fields-drupal-8-without-losing-data
+ * http://borutpiletic.com/article/drupal-update-change-field-length
+ */
+function qwizard_update_8001() {
+  $storage_key = 'subscription.field_schema_data.name';
+  $storage_schema = \Drupal::keyValue('entity.storage_schema.sql');
+  $field_schema = $storage_schema->get($storage_key);
+  $field_schema['subscription']['fields']['name']['length'] = 255;
+  $field_schema['subscription_revision']['fields']['name']['length'] = 255;
+  $storage_schema->set($storage_key, $field_schema);
+
+  $definition = BaseFieldDefinition::create('string')
+        ->setLabel(t('Name'))
+        ->setDescription(t('The name of the Subscription entity.'))
+        ->setRevisionable(TRUE)
+        ->setSettings([
+          'max_length'      => 255,
+          'text_processing' => 0,
+        ])
+        ->setDefaultValue('')
+        ->setDisplayOptions('view', [
+          'label'  => 'above',
+          'type'   => 'string',
+          'weight' => -4,
+        ])
+        ->setDisplayOptions('form', [
+          'type'   => 'string_textfield',
+          'weight' => -4,
+        ])
+        ->setDisplayConfigurable('form', TRUE)
+        ->setDisplayConfigurable('view', TRUE)
+        ->setRequired(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('name', 'subscription', 'subscription_type', $definition);
+}
+
+/**
+ * Update 8002 - Changes qwiz_result subscription_id settings to avoid LIKE queries
+ */
+function qwizard_update_8002() {
+
+  $definition = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Course'))
+    ->setDescription(t('The course of the Question Pool entity.'))
+    ->setCardinality(1)
+    ->setSetting('target_type', 'taxonomy_term')
+    ->setSetting('handler', 'default:taxonomy_term')
+    ->setSetting('handler_settings',
+      [
+        'target_bundles' => [
+          'courses' => 'courses',
+        ],
+      ])
+    ->setDisplayOptions('view', [
+      'label'  => 'hidden',
+      'type'   => 'author',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('form', [
+      'type'     => 'entity_reference_autocomplete',
+      'weight'   => 3,
+      'settings' => [
+        'match_operator'    => 'CONTAINS',
+        'size'              => '10',
+        'autocomplete_type' => 'tags',
+        'placeholder'       => '',
+      ],
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('subscription_id', 'qwiz_result', null, $definition);
+}
+
+/**
+ * Update 8003 - Adds subscription.premium column, populates with data. Entup should be ran first
+ * Check all subscriptions to see if the user has a premium role or not. Populate the premium column depending on whether it exists or not
+ */
+function qwizard_update_8003() {
+  $prem_courses = [200 => 'navle_premium', 201 => 'bcse_premium'];
+
+  $table_rows = \Drupal::entityQuery('subscription')
+    ->notExists('premium')
+    ->execute();
+  $subscriptions = \Drupal::entityTypeManager()->getStorage('subscription')->loadMultiple($table_rows);
+
+  $users_to_load = [];
+  foreach($subscriptions as $subscription) {
+    $users_to_load[] = $subscription->getOwnerId();
+  }
+  $users_loaded = User::loadMultiple($users_to_load);
+
+  foreach($subscriptions as $subscription){
+    $user_id = $subscription->getOwnerId();
+    $user = $users_loaded[$user_id];
+    $course_id = $subscription->getCourseId();
+    $is_premium = 0;
+    if(!empty($prem_courses[$course_id])){
+      if($user->hasRole($prem_courses[$course_id])){
+       $is_premium = 1;
+      }
+    }
+    $subscription->set('premium', $is_premium);
+    $subscription->save();
+  }
+}
+
+/**
+ * Update 8005 - Adds subterm.admin_created column, populates with data. Entup should be ran first
+  Commented out, taking a different approach
+function qwizard_update_8005() {
+  $table_rows = \Drupal::entityQuery('subterm')
+    ->notExists('admin_created')
+    ->execute();
+  $memberships = \Drupal::entityTypeManager()->getStorage('subterm')->loadMultiple($table_rows);
+
+  foreach($memberships as $subscription){
+    $comment = $subscription->get('comment')->value;
+
+    $is_admin_created = 0;
+    if(str_contains(strtolower($comment), 'admin')){
+      $is_admin_created = 1;
+    }
+
+    $subscription->set('admin_created', $is_admin_created);
+    $subscription->save();
+  }
+} */
+
+/**
+ * Update 8006 - uninstall ultimate_cron module and install simple_cron
+ */
+function qwizard_update_8006() {
+  // get module handler
+  $module_handler = \Drupal::service('module_handler');
+  $module_installer = \Drupal::service('module_installer');
+
+  $ultimate_cron_path = \Drupal::service('extension.list.module')->getPath('ultimate_cron');
+  // check if ultimate cron is installed
+  if ($module_handler->moduleExists('ultimate_cron')) {
+    // uninstall ultimate cron
+    $module_installer->uninstall(['ultimate_cron']);
+  }
+
+  $simple_cron_path = \Drupal::service('extension.list.module')->getPath('simple_cron');
+
+  // check if this module exists
+  if ($simple_cron_path) {
+    // check if simple cron is installed
+    if (!$module_handler->moduleExists('simple_cron')) {
+      // install simple cron
+      $module_installer->install(['simple_cron']);
+
+    } else {
+      // simple cron is already installed
+      \Drupal::logger('qwiz')->notice('Simple cron is already installed');
+    }
+  } else {
+    // log that we need to compose require and install simple cron
+    \Drupal::logger('qwiz')->notice('Please run "composer require drupal/simple_cron:^1.0" and then install the simple_cron module');
+  }
+}
+
+/**
+ * Increase FIELD size to 255.
+ */
+function qwizard_update_8008() {
+  _change_field_length('field_card_caption', 'node', 255);
+}
+
+/**
+ * Increase FIELD size to 255.
+ */
+function qwizard_update_8010() {
+  _change_field_length('field_caption', 'paragraph', 255);
+}
+
+/**
+ * Update 8012 - install zuku_app module
+ */
+function qwizard_update_8012() {
+  if(!\Drupal::service('module_handler')->moduleExists('zuku_app')){
+    \Drupal::service('module_installer')->install(['zuku_app']);
+  }
+}
+
+/*
+ * Update 91001 - remove qwsr_archive entity.
+ *
+ * Moving it to the qw_archive module.
+ */
+/*function qwizard_update_91001(&$sandbox) {
+  // Making sure the entities are deleted.
+  try {
+    $storage_handler = \Drupal::entityTypeManager()
+      ->getStorage('qwsr_archive');
+    $entities = $storage_handler->loadMultiple();
+    $storage_handler->delete($entities);
+  }
+  catch (PluginException $e) {
+    \Drupal::logger('qwizard')->error($e->getMessage());
+  }
+  catch (EntityStorageException $e) {
+    \Drupal::logger('qwizard')->error($e->getMessage());
+  }
+  // Uninstall the entity.
+  $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_update_manager->getEntityType('qwsr_archive');
+  $entity_update_manager->uninstallEntityType($entity_type);
+}
+*/
+
+/**
+ *  Post update - remove qw_archive entity def files after update 91001.
+ *
+ * @param $sandbox
+ *
+ * @return void
+ */
+function qwizard_post_update_remove_old_qwsr_archive_class_files(&$sandbox) {
+  $file_system = \Drupal::service('file_system');
+  $file_system->delete('web/modules/custom/qwizard/src/QwSRArchiveHtmlRouteProvider.php');
+  $file_system->delete('web/modules/custom/qwizard/src/Entity/QwSRArchiveInterface.php');
+  $file_system->delete('web/modules/custom/qwizard/src/Entity/QwSRArchive.php');
+  $file_system->delete('web/modules/custom/qwizard/src/QwSRArchiveAccessControlHandler.php');
+}
+function _change_field_length(string $field, string $entity_type, int $length){
+  $database = \Drupal::database();
+  // Retrieve existing field data.
+  $tables = [
+    "{$entity_type}__$field",
+    "{$entity_type}_revision__$field",
+  ];
+  $existing_data = [];
+  foreach ($tables as $table) {
+    // Get the old data.
+    $existing_data[$table] = $database->select($table)
+      ->fields($table)
+      ->execute()
+      ->fetchAll(PDO::FETCH_ASSOC);
+
+    // Wipe it.
+    $database->truncate($table)->execute();
+  }
+
+  $field_storage_configs = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config')
+    ->loadByProperties([
+      'field_name' => $field,
+    ]);
+  foreach ($field_storage_configs as $field_storage) {
+    $new_field_storage = $field_storage->toArray();
+    $new_field_storage['settings']['max_length'] = $length;
+
+    $new_field_storage = FieldStorageConfig::create($new_field_storage);
+    $new_field_storage->original = $new_field_storage;
+    $new_field_storage->enforceIsNew(FALSE);
+
+    $new_field_storage->save();
+  }
+
+  // Restore the data.
+  foreach ($tables as $table) {
+    $insert_query = $database
+      ->insert($table)
+      ->fields(array_keys(end($existing_data[$table])));
+    foreach ($existing_data[$table] as $row) {
+      $insert_query->values(array_values($row));
+    }
+    $insert_query->execute();
+  }
+}
+
+/**
+ * Remove stale qwsr_archive entity due to unnecessary files.
+ */
+function qwizard_update_91002(&$sandbox) {
+  $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+  if (!empty($entity_types['qwsr_archive'])) {
+    $type = $entity_types['qwsr_archive'];
+    $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+    $entity_update_manager->uninstallEntityType($type);
+  }
+  // Clear all caches, just in case.
+  drupal_flush_all_caches();
+}
+
+/**
+ * Adds field_image to classes vocabulary.
+ */
+function qwizard_update_91003(&$sandbox) {
+  $field_name = 'field_image';
+  $entity_type = 'taxonomy_term';
+  $bundle = 'classes';
+
+  // Check if field storage already exists.
+  if (!\Drupal::service('entity_type.manager')->getStorage('field_storage_config')->load($entity_type . '.' . $field_name)) {
+    // Define a field storage.
+    $field_storage_config = [
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'type' => 'image',
+      'settings' => [
+        'uri_scheme' => 'public',
+        'target_type' => 'file',
+        'display_field' => FALSE,
+        'display_default' => FALSE,
+        'default_image' => [
+          'uuid' => '',
+          'alt' => '',
+          'title' => '',
+          'width' => NULL,
+          'height' => NULL,
+        ],
+      ],
+      'cardinality' => 1,
+      'translatable' => TRUE,
+      'persist_with_no_fields' => FALSE,
+      'custom_storage' => FALSE,
+    ];
+
+    $field_storage = FieldStorageConfig::create($field_storage_config);
+    $field_storage->enforceIsNew(TRUE);
+    $field_storage->save();
+  }
+
+  // Check if field already exists on taxonomy term bundle.
+  if (!\Drupal::service('entity_type.manager')->getStorage('field_config')->load($entity_type . '.' . $bundle . '.' . $field_name)) {
+    // Define a field instance (attaching the field to a specific bundle).
+    $field_config = [
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'bundle' => $bundle,
+      'label' => 'Image',
+      'description' => '',
+      'required' => FALSE,
+      'translatable' => FALSE,
+      'settings' => [
+        'alt_field' => FALSE,
+        'alt_field_required' => FALSE,
+        'title_field' => FALSE,
+        'title_field_required' => FALSE,
+      ],
+    ];
+    $field = FieldConfig::create($field_config);
+    $field->enforceIsNew(TRUE);
+    $field->save();
+  }
+
+  // Update the form display settings.
+  $form_display = \Drupal::service('entity_display.repository')->getFormDisplay($entity_type, $bundle);
+  $form_display->setComponent($field_name, [
+    'type' => 'image_image',
+    'weight' => 5,
+    'region' => 'content',
+    'settings' => [
+      'progress_indicator' => 'throbber',
+      'preview_image_style' => 'thumbnail',
+    ],
+  ])->save();
+
+  // Update the view display settings.
+  $view_display = \Drupal::service('entity_display.repository')->getViewDisplay($entity_type, $bundle);
+  $view_display->setComponent($field_name, [
+    'type' => 'image',
+    'label' => 'hidden',
+    'settings' => [
+      'image_link' => '',
+      'image_style' => '',
+      'image_loading' => [
+        'attribute' => 'lazy',
+      ],
+    ],
+    'third_party_settings' => [],
+    'weight' => 5,
+    'region' => 'content',
+    ])->save();
+}

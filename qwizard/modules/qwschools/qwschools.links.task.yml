@@ -1,0 +1,22 @@
+# School routing definition
+
+entity.school.canonical:
+  route_name: entity.school.canonical
+  base_route: entity.school.canonical
+  title: 'View'
+
+entity.school.edit_form:
+  route_name: entity.school.edit_form
+  base_route: entity.school.canonical
+  title: 'Edit'
+
+entity.school.version_history:
+  route_name: entity.school.version_history
+  base_route: entity.school.canonical
+  title: 'Revisions'
+
+entity.school.delete_form:
+  route_name:  entity.school.delete_form
+  base_route:  entity.school.canonical
+  title: Delete
+  weight: 10

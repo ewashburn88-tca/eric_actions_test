@@ -1,0 +1,80 @@
+uuid: 269c6935-c459-41a6-b37f-9566a051f4f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.associations.field_administrator
+    - field.field.taxonomy_term.associations.field_course
+    - field.field.taxonomy_term.associations.field_students
+    - taxonomy.vocabulary.associations
+  module:
+    - bricks
+    - path
+    - text
+_core:
+  default_config_hash: nQ7-XwTKdl8lC3TdCi15F91dJwjCw_UvE9w9qJuVaqY
+id: taxonomy_term.associations.default
+targetEntityType: taxonomy_term
+bundle: associations
+mode: default
+content:
+  description:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      placeholder: ''
+      rows: 5
+    third_party_settings: {  }
+  field_administrator:
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: bricks_tree_autocomplete
+    region: content
+  field_course:
+    weight: 6
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_students:
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: bricks_tree_autocomplete
+    region: content
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 4
+    region: content
+    third_party_settings: {  }
+hidden: {  }

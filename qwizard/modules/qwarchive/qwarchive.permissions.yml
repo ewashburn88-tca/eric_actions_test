@@ -1,0 +1,9 @@
+administer qwizard archive:
+  title: 'Administer qwizard archive'
+  restrict access: true
+
+create archival via rest:
+  title: 'Create archival via REST'
+
+create restore request via rest:
+  title: 'Create restore request via REST'

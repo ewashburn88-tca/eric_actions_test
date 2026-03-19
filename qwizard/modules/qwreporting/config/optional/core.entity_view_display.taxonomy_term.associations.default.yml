@@ -1,0 +1,56 @@
+uuid: 5e0dcee4-421d-42a3-b56d-a701a96296ee
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.associations.field_administrator
+    - field.field.taxonomy_term.associations.field_course
+    - field.field.taxonomy_term.associations.field_students
+    - taxonomy.vocabulary.associations
+  module:
+    - bricks
+    - text
+_core:
+  default_config_hash: NME7kWuoGH2cZMFC9Jwe0ChX9-ZVnApxe8KMWNryTXU
+id: taxonomy_term.associations.default
+targetEntityType: taxonomy_term
+bundle: associations
+mode: default
+content:
+  description:
+    label: hidden
+    type: text_default
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_administrator:
+    weight: 1
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    type: bricks_nested
+    region: content
+  field_course:
+    weight: 3
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_students:
+    weight: 2
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    type: bricks_nested
+    region: content
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true

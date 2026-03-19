@@ -1,0 +1,194 @@
+<?php
+
+/**
+ * @file
+ * QW Archive module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_cron().
+ */
+function qwarchive_cron() {
+  // Check if automated archival is enabled.
+  $config = \Drupal::config('qwarchive.settings');
+
+  if (!$config->get('enable_cron_archival')) {
+    return;
+  }
+
+  // Get batch size.
+  $batch_size = $config->get('cron_batch_size') ?: 50;
+  $inactive_threshold = $config->get('inactive_threshold') ?: 'since 12/31/2023';
+
+  // Get inactive users.
+  // Pass FALSE for $use_pager to get batch of users without pager overhead.
+  $users = \Drupal::service('qwarchive.user_manager')->getInactiveUsers($inactive_threshold, [], NULL, $batch_size, FALSE);
+  if (empty($users)) {
+    return;
+  }
+
+  $logger = \Drupal::logger('qwarchive');
+  $logger->info('Found @count inactive users to process.', ['@count' => count($users)]);
+
+  $queue = \Drupal::queue('qwarchive_process');
+  $queue->createQueue();
+
+  $archive_manager = \Drupal::service('qwarchive.manager');
+  $record_manager = \Drupal::service('qwarchive.record_manager');
+  $data_types = array_keys($archive_manager->getDataTypeCallbacks());
+
+  // Get users who have data to archive.
+  $uids = array_map(function ($account) {
+    return $account->id();
+  }, $users);
+  $uids_with_data = \Drupal::service('qwarchive.user_manager')->getUsersWithData($uids);
+
+  $queued_count = 0;
+  foreach ($users as $account) {
+    // Check if user has data.
+    if (!isset($uids_with_data[$account->id()])) {
+      continue;
+    }
+
+    // Add record to database with QUEUED status.
+    $record_manager->add($account->id(), $data_types, 'cron');
+
+    // Add item to queue.
+    $data = [
+      'uid' => $account->id(),
+      'data_types' => $data_types,
+    ];
+    $queue->createItem($data);
+    $queued_count++;
+  }
+
+  if ($queued_count > 0) {
+    $logger->info('Queued @count users for archival.', ['@count' => $queued_count]);
+  }
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function qwarchive_user_login(UserInterface $account) {
+  if (!\Drupal::service('qwarchive.record_manager')->userHasArchivedData($account->id())) {
+    return;
+  }
+  qwarchive_show_data_archival_message($account);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function qwarchive_user_delete(UserInterface $account) {
+  $record_manager = \Drupal::service('qwarchive.record_manager');
+  // Remove entries from archival records.
+  $record_manager->removeRecord($account->id(), TRUE, FALSE, TRUE);
+  // Delete the json directory.
+  \Drupal::service('qwarchive.storage_manager')->deleteJsonDirectory($account->id());
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function qwarchive_form_user_form_alter(array &$form, FormStateInterface &$form_state, string $form_id) {
+  $account = $form_state->getFormObject()->getEntity();
+  if (!($account instanceof UserInterface)) {
+    return;
+  }
+  if (!\Drupal::service('qwarchive.record_manager')->userHasArchivedData($account->id())) {
+    return;
+  }
+  qwarchive_show_data_archival_message($account);
+
+  $form['data_restore_container'] = [
+    '#type' => 'container',
+    '#weight' => 999,
+    '#attributes' => [
+      'id' => 'restore-settings',
+    ],
+  ];
+  $form['data_restore_container']['data_restore'] = [
+    '#type' => 'details',
+    '#title' => t('Data restore'),
+    '#open' => TRUE,
+  ];
+
+  $form['data_restore_container']['data_restore']['restore_actions'] = [
+    '#type' => 'actions',
+    '#prefix' => '<div id="restore-action-wrapper">',
+    '#suffix' => '</div>',
+  ];
+
+  // First check if user has already submitted for the request.
+  $restore_request = \Drupal::service('qwarchive.record_manager')->getRestoreRequest($account->id());
+  if (empty($restore_request)) {
+    $form['data_restore_container']['data_restore']['restore_actions']['restore'] = [
+      '#type' => 'submit',
+      '#value' => t('Request for restore'),
+      '#ajax' => [
+        'callback' => 'qwarchive_restore_user_data',
+        'wrapper' => 'restore-action-wrapper',
+      ],
+    ];
+  }
+  else {
+    $form['data_restore_container']['data_restore']['restore_actions'] = qwarchive_get_restore_request_element();
+  }
+}
+
+/**
+ * Callback to add user data restore to queue.
+ */
+function qwarchive_restore_user_data($form, $form_state) {
+  $account = $form_state->getFormObject()->getEntity();
+  $data_type_callbacks = \Drupal::service('qwarchive.restore_manager')->getDataTypeCallbacks();
+  // Create a cron queue.
+  $queue_name = 'qwarchive_restore_process';
+  $queue = \Drupal::queue($queue_name);
+  $queue->createQueue();
+  $data = [
+    'uid' => $account->id(),
+    'data_type_callbacks' => $data_type_callbacks,
+  ];
+  $item_id = $queue->createItem($data);
+
+  $comment = 'Queue item id: ' . $item_id;
+
+  // Add restore status.
+  \Drupal::service('qwarchive.record_manager')->addRestoreRequest($account->id(), 'cron', $comment);
+
+  $form['data_restore_container']['data_restore']['restore_actions'] = qwarchive_get_restore_request_element();
+
+  return $form['data_restore_container']['data_restore']['restore_actions'];
+}
+
+/**
+ * Shows the archival notification message.
+ */
+function qwarchive_show_data_archival_message(UserInterface $account) {
+  $url = $account->toUrl('edit-form', ['fragment' => 'restore-settings']);
+  // User data has been archived. Show the message to user.
+  \Drupal::messenger()
+    ->addWarning(t('Since you have not logged in for a while, your data has been archived to keep things tidy. You can <a href=":url">request to restore</a> it anytime.', [
+      ':url' => $url->toString(),
+    ]));
+}
+
+/**
+ * Returns restore request message element.
+ */
+function qwarchive_get_restore_request_element() {
+  $webform_id = 'contact';
+  $url = Url::fromRoute('entity.webform.canonical', ['webform' => $webform_id]);
+
+  return [
+    '#markup' => t('Your data restore request has been submitted successfully. If your data isn’t restored within 2 days, please <a href=":url">contact</a> our support team.', [
+      ':url' => $url->toString(),
+    ]),
+  ];
+}

@@ -1,0 +1,33 @@
+add school entities:
+  title: 'Create new School entities'
+
+administer school entities:
+  title: 'Administer School entities'
+  description: 'Allow to access the administration form to configure School entities.'
+  restrict access: true
+
+delete school entities:
+  title: 'Delete School entities'
+
+edit school entities:
+  title: 'Edit School entities'
+
+view published school entities:
+  title: 'View published School entities'
+
+view unpublished school entities:
+  title: 'View unpublished School entities'
+
+view all school revisions:
+  title: 'View all School revisions'
+
+revert all school revisions:
+  title: 'Revert all School revisions'
+  description: 'Role requires permission <em>view School revisions</em> and <em>edit rights</em> for school entities in question or <em>administer school entities</em>.'
+
+delete all school revisions:
+  title: 'Delete all revisions'
+  description: 'Role requires permission to <em>view School revisions</em> and <em>delete rights</em> for school entities in question or <em>administer school entities</em>.'
+
+permission_callbacks:
+  - \Drupal\qwschools\SchoolPermissions::generatePermissions

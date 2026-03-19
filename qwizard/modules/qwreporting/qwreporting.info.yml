@@ -1,0 +1,7 @@
+name: 'Quiz Wizard Reporting'
+type: module
+description: 'Student reporting module.'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - qwizard

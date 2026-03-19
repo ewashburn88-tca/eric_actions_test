@@ -1,0 +1,7 @@
+entity.marked_question.settings:
+  path: 'admin/structure/marked-question'
+  defaults:
+    _form: '\Drupal\qwmarked\Form\MarkedQuestionSettingsForm'
+    _title: 'marked_question'
+  requirements:
+    _permission: 'administer marked_question'

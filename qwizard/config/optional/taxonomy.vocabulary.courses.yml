@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Courses
+vid: courses
+description: 'Top level course categories with corresponding roles'
+hierarchy: 0
+weight: -10

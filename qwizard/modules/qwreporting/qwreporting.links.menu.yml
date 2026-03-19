@@ -1,0 +1,6 @@
+qwreporting.admin_reports:
+  title: 'Faculty Reports'
+  description: 'Faculty progress reporting'
+  route_name: qwreporting.hompage
+  parent: qwizard.admin_qwizard
+  weight: 98

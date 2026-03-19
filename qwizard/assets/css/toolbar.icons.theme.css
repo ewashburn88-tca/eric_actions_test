@@ -1,0 +1,10 @@
+/**
+ * Main menu icons.
+ */
+.toolbar-icon-qwizard-admin-qwizard:before {
+    background-image: url(../../images/icons/787878/icons8-intelligence-26.png);
+}
+.toolbar-icon-qwizard-admin-qwizard:active:before,
+.toolbar-icon-qwizard-admin-qwizard.is-active:before {
+    background-image: url(../../images/icons/000000/icons8-intelligence-26.png);
+}

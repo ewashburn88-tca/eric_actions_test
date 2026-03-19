@@ -1,0 +1,90 @@
+qwizard.admin_qwizard:
+  title: 'Quiz Wizard'
+  description: 'Manage Quiz Wizard.'
+  route_name: qwizard.admin_qwizard
+  parent: system.admin
+  weight: 3
+
+qwizard.admin_qwizard.configuration:
+  title: 'Quiz Wizard Configuration'
+  description: 'Manage Quiz Wizard.'
+  route_name: qwizard.admin_qwizard.configuration
+  parent: qwizard.admin_qwizard
+  weight: 3
+
+qwizard.admin_qwizard.structure:
+  title: 'Quiz Wizard Structure'
+  description: 'Manage Quiz Wizard.'
+  route_name: qwizard.admin_qwizard.structure
+  parent: qwizard.admin_qwizard
+  weight: 3
+
+# Quiz menu items definition
+entity.qwiz.collection:
+  title: 'Quiz list'
+  route_name: entity.qwiz.collection
+  description: 'List Quiz entities'
+  parent: qwizard.admin_qwizard
+  weight: -50
+
+# Quiz Results menu items definition
+entity.qwiz_result.collection:
+  title: 'Quiz Results list'
+  route_name: entity.qwiz_result.collection
+  description: 'List Quiz Results entities'
+  parent: qwizard.admin_qwizard
+  weight: -40
+
+# Question Pool menu items definition
+entity.qwpool.collection:
+  title: 'Question Pool list'
+  route_name: entity.qwpool.collection
+  description: 'List Question Pool entities'
+  parent: qwizard.admin_qwizard
+  weight: -10
+
+# Quiz type menu items definition
+entity.qwiz_type.collection:
+  title: 'Quiz type'
+  route_name: entity.qwiz_type.collection
+  description: 'List Quiz type (bundles)'
+  parent: qwizard.admin_qwizard.structure
+  weight: 0
+
+# Question Pool type menu items definition
+entity.qwpool_type.collection:
+  title: 'Question Pool type'
+  route_name: entity.qwpool_type.collection
+  description: 'List Question Pool type (bundles)'
+  parent: qwizard.admin_qwizard.structure
+  weight: 10
+
+qwizard.qwizard_settings_form:
+  title: 'QwizardSettingsForm'
+  route_name: qwizard.qwizard_settings_form
+  description: 'Manage Quiz Wizard'
+  parent: qwizard.admin_qwizard.configuration
+  weight: -50
+
+qwiz_result.admin.structure.settings:
+  title: 'Quiz Results settings'
+  description: 'Configure Quiz Results entities'
+  route_name: qwiz_result.settings
+  parent: qwizard.admin_qwizard.configuration
+
+# Qw student results type menu items definition
+entity.qw_student_results_type.collection:
+  title: 'Qw student results type'
+  route_name: entity.qw_student_results_type.collection
+  description: 'List Qw student results type (bundles)'
+  parent: qwizard.admin_qwizard.configuration
+  weight: 99
+
+# Student Results menu items definition
+entity.qw_student_results.collection:
+  title: 'Student Results list'
+  route_name: entity.qw_student_results.collection
+  description: 'List Student Results entities'
+  parent: qwizard.admin_qwizard.configuration
+  weight: 100
+

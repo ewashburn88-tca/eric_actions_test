@@ -1,0 +1,386 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display something.
+ *
+ * Available variables:
+ * - foo: Foo variable description.
+ *
+ * @see template_preprocess_qwreporting_individual_results()
+ *
+ * @ingroup themeable
+ */
+#}
+
+
+{# {{ attach_library('qwreporting/qwreporting.DoubleScroll') }}
+{{ attach_library('qwreporting/qwreporting.individual_results') }} #}
+
+{% set progressBarClass = is_timed_test_mode ? 'progress-bar-success bg-success' : 'progress-bar-primary bg-primary' %}
+
+<div class="group-individual-results wrapper-class">
+  <div class="wrapper">
+    {#  <div class="wmd-view-topscroll" >
+    <div class="scroll-div1 scroll-div">
+    </div>
+  </div> #}
+    <div class="wrapper wmd-view wmd-view-freeze">
+      <div class="scroll-div2 scroll-div results-scroll">
+
+        {# <div class="form-wrapper">
+
+    <form id="qwreporting-individual-results" action="{{ filter.current_path }}"  style="margin-bottom:15px" method="GET">
+    <label for="topic">{{ 'Filter by Topic'|t }}:</label>
+    <select name="topic" id="topic" form="qwreporting-individual-results">
+      <option value="">{{ 'Overall'|t }}</option>
+      {% for key,item in filter.topics %}
+        <option {{ key == filter.selected_topic ? 'selected' }} value="{{ key }}">{{ item }}</option>
+      {% endfor %}
+    </select>
+      <br />
+        #}{# <label for="period"> {{ 'Results from Time'|t }}: </label>
+    <select name="period">
+      <option value="">{{ 'All Time'|t }}</option>
+      {% for key,item in filter.days %}
+        <optgroup label="{{ key }}">
+          {% for key, value in item %}
+           <option {{ value == filter.period ? 'selected' }} value="{{ value }}">{{ key }}</option>
+          {% endfor %}
+        </optgroup>
+      {% endfor %}
+    </select> #}
+
+        {# <label for="period">Results After start of day:</label>
+    <input type="date" data-drupal-selector="edit-date" data-drupal-date-format="Y-m-d" id="edit-date" name="period" value="{{ filter.days.start }}" class="form-date" tabindex="-1" />
+
+    <label for="period_end">Results Before end of day:</label>
+    <input type="date" data-drupal-selector="edit-date" data-drupal-date-format="Y-m-d" id="edit-date" name="period_end" value="{{ filter.days.end }}" class="form-date" tabindex="-1" />
+
+
+      <br />
+    <input style="margin-left:0px; border-style:double;border:1px solid black;width:200px" type="submit" value="{{ 'Filter'|t }}">
+    <a href="{{ url('qwreporting.results.individual', {'group' : group.id}) }}">
+    <button style="border-style:double" type="button">{{ 'Clear'|t }}</button>
+    </a>
+  </form>
+
+  </div> #}
+        {% if show_all_topics_in_table %}
+          <table class="table">
+            <thead>
+            <tr>
+              {# <th>UID</th> #}
+              {# <th class="small-column">#</th> #}
+              <th>{{ 'Student Name'|t }}</th>
+              {# <th>{{ 'Username'|t }}</th> #}
+              <th>{{ 'Email'|t }}</th>
+              <th>{{ 'Overall Progress'|t }}</th>
+              <th class="small-column">{{ 'Overall Score'|t }}</th>
+
+              {% for topic in topics %}
+                <th>{{ topic.label ~ ''|t }}</th>
+                <th class="small-column">{{ 'Score'|t }}</th>
+              {% endfor %}
+
+              <th>{{ 'Last Access'|t }}</th>
+            </tr>
+            </thead>
+
+            {% set i = 0 %}
+
+            {# {{ dd(students) }} #}
+            {% for student in students %}
+
+              {% set i = i + 1 %}
+              <tr>
+                {# <td> {{ i }} </td> #}
+                <td><a target="_blank"
+                       href="{{ url('qwreporting.student.details', {'course':course, 'student':student.id}) }}">{{ student.combined_name }}</a>
+                </td>
+                <td>{{ student.email }}</td>
+
+                {% if student.data.test_mode.totalQuestion > 0 %}
+                  {# Combined #}
+                  {#            {{ dump(student.data) }} #}
+                  <td>
+                    {% set combined_total = student.data.totalQuestion %}
+                    {% set combined_total_correct = student.data.correct %}
+                    {{ (combined_total_correct / combined_total)|number_format(3) * 100 }}
+                    % ({{ combined_total_correct }}/{{ combined_total }})
+
+                    <div class="progress progress-striped active">
+                      <div
+                        class="progress-bar progress-bar-striped progress-bar-animated {{ progressBarClass }}"
+                        role="progressbar"
+                        style="width:{{ student.data.overallProgress|number_format }}%;display: block; float: right;"
+                        aria-valuenow="{{ student.data.overallProgress|trim('%')|number_format }}"
+                        aria-valuemin="0" aria-valuemax="100">
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="small-column">{{ student.data.test_mode.avg|number_format }}
+                    %
+                  </td>
+
+                  {% for topic in student.other_topics %}
+                    {# {{ dump(topic) }} #}
+                    <td>
+                      {% set combined_total = topic.totalQuestion %}
+                      {% set combined_total_correct = topic.correct %}
+                      {{ (combined_total_correct / combined_total)|number_format(3) * 100 }}
+                      % ({{ combined_total_correct }}/{{ combined_total }})
+
+                      <div class="progress progress-striped active">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated {{ progressBarClass }}"
+                          role="progressbar"
+                          style="width:{{ topic.overallProgress|number_format }}%;display: block; float: right;"
+                          aria-valuenow="{{ topic.overallProgress|trim('%')|number_format }}"
+                          aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                        {# <div class="progress-bar progress-bar-striped progress-bar-animated progress-bar-success bg-success"
+                       role="progressbar" style="width:{{ topic.overallProgress|number_format }}%;" aria-valuenow="{{ topic.overallProgress|trim('%')|number_format / 2 }}"
+                       aria-valuemin="0" aria-valuemax="50">
+                  </div> #}
+                      </div>
+                    </td>
+                    <td class="small-column">{{ topic.avg|number_format }}%</td>
+                  {% endfor %}
+
+                  <td>{{ student.data.last_access|raw }}</td>
+                {% else %}
+                  {% if(filter.period) %}
+                    <td><span
+                        style="color:red;">{{ 'No results in time period selected.'|t }}</span>
+                    </td>
+                  {% else %}
+                    <td><span
+                        style="color:red;">{{ 'Student not subscribed.'|t }}</span>
+                    </td>
+                  {% endif %}
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          {% if is_primary_course %}
+            <table class="table">
+              <thead>
+              <tr>
+                {# <th>UID</th> #}
+                {# <th class="small-column">#</th> #}
+                <th>{{ 'Student Name'|t }}</th>
+                {# <th>{{ 'Username'|t }}</th> #}
+                <th>{{ 'Email'|t }}</th>
+                <th>{{ 'Overall Progress'|t }}</th>
+                <th>{{ 'Practice Test Progress'|t }}</th>
+                <th class="small-column">{{ 'Score'|t }}</th>
+                <th>{{ 'Timed Test Progress'|t }}</th>
+                <th class="small-column">{{ 'Score'|t }}</th>
+                <th>{{ 'Last Access'|t }}</th>
+              </tr>
+              </thead>
+
+              {% set i = 0 %}
+
+              {# {{ dd(students) }} #}
+              {% for student in students %}
+
+                {% set i = i + 1 %}
+                <tr>
+                  {# <td> {{ i }} </td> #}
+                  <td><a target="_blank"
+                         href="{{ url('qwreporting.student.details', {'course':course, 'student':student.id}) }}">{{ student.combined_name }}</a>
+                  </td>
+                  <td>{{ student.email }}</td>
+
+                  {% if student.data.test_mode.totalQuestion > 0 %}
+                    {# Combined #}
+                    {# {{ dump(student.data) }} #}
+                    <td>
+                      {% set combined_total = student.data.totalQuestion + student.data.test_mode.totalQuestion %}
+                      {% set combined_total_correct = student.data.correct + student.data.test_mode.correct %}
+                      {{ (combined_total_correct / combined_total)|number_format(3) * 100 }}
+                      % ({{ combined_total_correct }}/{{ combined_total }})
+
+                      <div class="progress progress-striped active">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated {{ progressBarClass }}"
+                          role="progressbar"
+                          style="width:{{ student.data.overallProgress|number_format / 2 }}%;display: block; float: right;"
+                          aria-valuenow="{{ student.data.overallProgress|trim('%')|number_format / 2 }}"
+                          aria-valuemin="0" aria-valuemax="50">
+                        </div>
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated progress-bar-success bg-success"
+                          role="progressbar"
+                          style="width:{{ student.data.test_mode.overallProgress|number_format / 2 }}%;"
+                          aria-valuenow="{{ student.data.test_mode.overallProgress|trim('%')|number_format / 2 }}"
+                          aria-valuemin="0" aria-valuemax="50">
+                        </div>
+                      </div>
+                    </td>
+
+                    {# Study Mode #}
+                    <td>{{ student.data.overallProgress|number_format(1) }}%
+                      ({{ student.data.correct|number_format }}
+                      /{{ student.data.totalQuestion|number_format }})
+                      <div class="progress progress-striped active">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated {{ progressBarClass }}"
+                          role="progressbar"
+                          style="width:{{ student.data.overallProgress }};display: block; float: left;"
+                          aria-valuenow="{{ student.data.overallProgress|trim('%') }}"
+                          aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                      </div>
+                    </td>
+
+                    <td
+                      class="small-column">{{ student.data.avg|number_format }}%
+                    </td>
+
+                    {# Test Mode #}
+                    <td>{{ student.data.test_mode.overallProgress|number_format(1) }}
+                      % ({{ student.data.test_mode.correct|number_format }}
+                      /{{ student.data.test_mode.totalQuestion|number_format }})
+                      <div class="progress progress-striped active">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated progress-bar-primary bg-success"
+                          role="progressbar"
+                          style="width:{{ student.data.test_mode.overallProgress }};display: block; float: left;"
+                          aria-valuenow="{{ student.data.test_mode.overallProgress|trim('%') }}"
+                          aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                      </div>
+                    </td>
+
+                    <td
+                      class="small-column">{{ student.data.test_mode.avg|number_format }}
+                      %
+                    </td>
+                    <td>{{ student.data.last_access|raw }}</td>
+                  {% else %}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    {% if(filter.period) %}
+                      <td><span
+                          style="color:red;">{{ 'No results in time period selected.'|t }}</span>
+                      </td>
+                    {% else %}
+                      <td><span
+                          style="color:red;">{{ 'Student not subscribed.'|t }}</span>
+                      </td>
+                    {% endif %}
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </table>
+          {% else %}
+            {# SECONDARY COURSE #}
+
+            <table class="table">
+              <thead>
+              <tr>
+                {# <th>UID</th> #}
+                {# <th class="small-column">#</th> #}
+                <th>{{ 'Student Name'|t }}</th>
+                {# <th>{{ 'Username'|t }}</th> #}
+                <th>{{ 'Email'|t }}</th>
+                <th>{{ 'Progress'|t }} %</th>
+                <th class="small-column">{{ 'Score'|t }}</th>
+                <th>{{ 'Last Access'|t }}</th>
+              </tr>
+              </thead>
+
+              {% set i = 0 %}
+
+              {# {{ dd(students) }} #}
+              {% for student in students %}
+
+                {% set i = i + 1 %}
+                <tr>
+                  {# <td> {{ i }} </td> #}
+                  <td><a target="_blank"
+                         href="{{ url('qwreporting.student.details', {'course':course, 'student':student.id}) }}">{{ student.combined_name }}</a>
+                  </td>
+                  <td>{{ student.email }}</td>
+
+                  {% set secondary_class = false %}
+                  {% if student.data.secondary[selected_class]['qwiz_id'] %}
+                    {% set secondary_class = student.data.secondary[selected_class] %}
+                  {% elseif student.data.secondary[selected_class][selected_topic_id] %}
+                    {% set secondary_class = student.data.secondary[selected_class][selected_topic_id] %}
+                    {#          {{ 'SELECTED TOPIC ID' }} #}
+                  {% elseif student.data.secondary[selected_class][selected_qwiz_id] %}
+                    {% set secondary_class = student.data.secondary[selected_class][selected_qwiz_id] %}
+                    {#          {{ 'SELECTED QWIZ ID' }} #}
+                  {% elseif student.data.secondary[selected_class] and student.data.secondary[selected_class.tid.value].totalQuestion > 0 %}
+                    {#          {{ 'SELECTED CLASS ID' }} #}
+                    {% set secondary_class = student.data.secondary[selected_class] %}
+                  {% else %}
+                    {% set secondary_class_element = student.data.secondary[selected_class]|first %}
+                    {% if secondary_class_element.totalQuestion > 0 %}
+                      {% set secondary_class = secondary_class_element %}
+                    {% endif %}
+                  {% endif %}
+
+                  {% if secondary_class %}
+                    {# Sometimes the totalQuestion label can come in different. account for both totalQuestion & total_questions #}
+                    {% if secondary_class.totalQuestion %}
+                      {% set combined_total = secondary_class.totalQuestion %}
+                      {% set combined_total_correct = secondary_class.correct %}
+                      {% set percent_done = secondary_class.overallProgress|trim('%')|number_format %}
+                    {% elseif(secondary_class.total_questions) %}
+                      {% set combined_total = secondary_class.total_questions %}
+                      {% set combined_total_correct = secondary_class.correct %}
+                      {% set percent_done = (( secondary_class.correct / combined_total)|number_format(3)) * 100 %}
+                    {% endif %}
+                    {# Combined #}
+                    {# {{ dump(student.data) }} #}
+                    <td>
+                      {{ (combined_total_correct / combined_total)|number_format(3) * 100 }}
+                      % ({{ combined_total_correct }}/{{ combined_total }})
+
+                      <div class="progress progress-striped active">
+                        <div
+                          class="progress-bar progress-bar-striped progress-bar-animated {{ progressBarClass }}"
+                          role="progressbar"
+                          style="width:{{ percent_done|trim('%')|number_format }}%;display: block; float: right;"
+                          aria-valuenow="{{ percent_done|trim('%')|number_format }}"
+                          aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                      </div>
+                    </td>
+
+                    <td
+                      class="small-column">{{ secondary_class.avg|number_format }}
+                      %
+                    </td>
+                    <td>{{ student.data.last_access|raw }}</td>
+                  {% else %}
+                    <td></td>
+                    <td></td>
+                    {% if(filter.period) %}
+                      <td><span
+                          style="color:red;">{{ 'No results in time period selected.'|t }}</span>
+                      </td>
+                    {% else %}
+                      <td><span
+                          style="color:red;">{{ 'Class results not found.'|t }}</span>
+                      </td>
+                    {% endif %}
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </table>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

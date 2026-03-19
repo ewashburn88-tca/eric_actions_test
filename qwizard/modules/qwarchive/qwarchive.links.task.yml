@@ -1,0 +1,34 @@
+qwarchive.qw_user_list:
+  route_name: qwarchive.qw_user_list
+  base_route: qwarchive.qw_user_list
+  title: 'Users'
+
+qwarchive.qw_archive_list:
+  route_name: qwarchive.qw_archive_list
+  base_route: qwarchive.qw_user_list
+  title: 'Archive List'
+  weight: 95
+
+qwarchive.qw_restore_requests_list:
+  route_name: qwarchive.qw_restore_requests_list
+  base_route: qwarchive.qw_user_list
+  title: 'Restore Requests'
+  weight: 96
+
+qwarchive.create_form:
+  route_name: qwarchive.create_form
+  base_route: qwarchive.qw_user_list
+  title: 'Create Archive'
+  weight: 97
+
+qwarchive.settings:
+  route_name: qwarchive.settings
+  base_route: qwarchive.qw_user_list
+  title: 'Settings'
+  weight: 98
+
+qwarchive.storage_settings:
+  route_name: qwarchive.storage_settings
+  base_route: qwarchive.qw_user_list
+  title: 'Storage Settings'
+  weight: 99

@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * @file
+ * Installation functions Qwizard Archive module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function qwarchive_schema() {
+  $schema['qwarchive_user_archive'] = [
+    'description' => 'Stores archive runs per user.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique record ID.',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The {users}.uid of the user associated with the record.',
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'description' => 'The status of the archive.',
+      ],
+      'comment' => [
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'The comment for the record, if any.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Timestamp when the record was created.',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  $schema['qwarchive_user_archive_item'] = [
+    'description' => 'Stores results for each archive type per run.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique record ID.',
+      ],
+      'archive_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'FK to qwarchive_user_archive.id',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The {users}.uid of the user associated with the record.',
+      ],
+      'type' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'description' => 'Type of the archived data.',
+      ],
+      'status' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'description' => 'The status of the archive item.',
+      ],
+      'comment' => [
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'The comment for the record, if any.',
+      ],
+      'filename' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+        'description' => 'The name of the file.',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  $schema['qwarchive_user_data_map'] = [
+    'description' => 'Stores data mapping for restore.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique record ID.',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The {users}.uid of the user associated with the record.',
+      ],
+      'type' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'description' => 'Type of the archived data.',
+      ],
+      'old_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The old identifier of entity.',
+      ],
+      'new_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The new identifier of entity.',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  $schema['qwarchive_user_restore'] = [
+    'description' => 'Stores restore requests for user.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique record ID.',
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'description' => 'The {users}.uid of the user associated with the record.',
+      ],
+      'status' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'description' => 'The status of the restore.',
+      ],
+      'comment' => [
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'The comment for the record, if any.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Timestamp when the record was created.',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function qwarchive_uninstall() {
+  \Drupal::configFactory()->getEditable('qwarchive.settings')->delete();
+}

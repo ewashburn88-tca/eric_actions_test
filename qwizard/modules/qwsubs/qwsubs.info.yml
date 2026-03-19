@@ -1,0 +1,7 @@
+name: 'Quiz Wizard Subscriptions'
+type: module
+description: 'User subscriptions, with term, role expire, renewal limits and history.'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - qwizard

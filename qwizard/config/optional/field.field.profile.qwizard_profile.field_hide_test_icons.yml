@@ -1,0 +1,28 @@
+uuid: c3cd36c1-eb5a-4b24-88b6-1caa6a1f0b56
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_hide_test_icons
+    - profile.type.qwizard_profile
+  module:
+    - profile
+third_party_settings:
+  profile:
+    profile_private: true
+id: profile.qwizard_profile.field_hide_test_icons
+field_name: field_hide_test_icons
+entity_type: profile
+bundle: qwizard_profile
+label: 'Hide Test Icons'
+description: 'Indicates if the user wants the icon to always show or hide.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

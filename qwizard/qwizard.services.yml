@@ -1,0 +1,54 @@
+services:
+  qwizard.general:
+    class: Drupal\qwizard\QwizardGeneral
+    arguments: []
+
+  logger.channel.qwizard:
+    parent: logger.channel_base
+    arguments: ['qwizard']
+
+  qwizard.randomizer:
+    class: Drupal\qwizard\Randomizer
+    arguments: []
+
+  qwizard.cache:
+    class: Drupal\qwizard\QwCache
+    arguments: ['@qwizard.general', '@qwrest.general', '@file_system']
+
+  qwizard.access_checker:
+    class: Drupal\qwizard\Access\QwizardAccess
+    arguments: ['@current_user']
+    tags:
+    - { name: access_check, applies_to: _qwizard_access }
+
+  qwizard.site_results:
+    class: Drupal\qwizard\SiteResults
+    arguments: []
+
+  qwizard.coursehandler:
+    class: Drupal\qwizard\CourseHandler
+    arguments: ['@qwizard.general', '@qwsubs.subscription_handler', '@tempstore.private']
+
+  qwizard.classeshandler:
+    class: Drupal\qwizard\ClassesHandler
+    arguments: []
+
+  qwizard.student_results_handler:
+    class: Drupal\qwizard\QwStudentResultsHandler
+    arguments: []
+
+  qwizard.qwiz_session_handler:
+    class: Drupal\qwizard\QwizSessionHandler
+    arguments: []
+
+  qwizard.membership:
+    class: Drupal\qwizard\MembershipHandler
+    arguments: ['@current_user','@qwsubs.subscription_handler']
+
+  qwizard.merged_qwiz:
+    class: Drupal\qwizard\MergedQwiz
+    arguments: []
+
+  qwizard.question_transform_text:
+    class: Drupal\qwizard\QuestionTransformText
+    arguments: []

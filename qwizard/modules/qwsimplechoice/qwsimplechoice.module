@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains qwsimplechoice.module.
+ */
+
+include 'includes/qwsimplechoice.inc';
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwsimplechoice_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the qwsimplechoice module.
+    case 'help.page.qwsimplechoice':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Very simple multiple choice question type with single feedback and one correct answer.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function qwsimplechoice_theme() {
+  return [
+    'qwsimplechoice' => [
+      'render element' => 'children',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function qwsimplechoice_node_presave($node) {
+  if ($node->getType() == 'qw_simple_choice') {
+    \Drupal::service('qwsimplechoice.presave_service')->updateAIDs($node);
+  }
+}
+
+

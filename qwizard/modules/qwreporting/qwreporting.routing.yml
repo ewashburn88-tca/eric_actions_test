@@ -1,0 +1,148 @@
+qwreporting.hompage:
+  path: '/admin/qwreporting'
+  defaults:
+    _title: 'Faculty progress reporting'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.group_new:
+  path: '/admin/qwreporting/group-new'
+  defaults:
+    _title: 'New group'
+    _form: 'Drupal\qwreporting\Form\GroupEditForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.group_edit:
+  path: '/admin/qwreporting/{group}/edit'
+  defaults:
+    _title: 'Edit group'
+    _form: 'Drupal\qwreporting\Form\GroupEditForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.group_email:
+  path: '/admin/qwreporting/{group_id}/email'
+  defaults:
+    _title: 'Email'
+    _form: 'Drupal\qwreporting\Form\GroupEmailForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.group_ops:
+  path: '/admin/qwreporting/{group_id}/ops'
+  defaults:
+    _title: 'User Operations'
+    _form: 'Drupal\qwreporting\Form\GroupOpsForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+#qwreporting.results.individual:
+#  path: '/admin/qwreporting/{group}/results/individual'
+#  defaults:
+#    _title: 'Individual Results'
+#    _controller: '\Drupal\qwreporting\Controller\QwreportingIndividualResultsController::build'
+#  requirements:
+#    _permission: 'access qwreporting'
+#  options:
+#    _admin_route: FALSE
+qwreporting.results.individual:
+  path: '/admin/qwreporting/{group}/results/individual'
+  defaults:
+    _title: 'Group Results'
+    _form: 'Drupal\qwreporting\Form\QwreportingGroupResultsForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.student.details:
+  path: '/admin/qwreporting/{course}/{student}/details'
+  defaults:
+    _title: 'Student Details'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingStudentDetailController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.excel:
+  path: '/admin/qwreporting/{group}/results/excel'
+  defaults:
+    _title: 'Excel Download table'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingExcelExportController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.excel.details:
+  path: '/admin/qwreporting/{course}/{student}/results/excel'
+  defaults:
+    _title: 'Excel results for student and group'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingExcelStudentDetailsController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.download_all:
+  path: '/admin/qwreporting/{group}/results/download/all'
+  defaults:
+    _title: 'Download all results'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingExcelExportAllController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.download_snapshots:
+  path: '/admin/qwreporting/{group}/results/download/{exam_id}/sessions'
+  defaults:
+    _title: 'Time spent per test'
+    _controller: '\Drupal\qwreporting\Controller\QwreportingExcelExportSnapshotsController::build'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.archive_group:
+  path: '/admin/qwreporting/{group}/archive'
+  defaults:
+    _title: 'Archive Group'
+    _controller: '\Drupal\qwreporting\Controller\GroupController::archiveGroup'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.restore_group:
+  path: '/admin/qwreporting/{group}/restore'
+  defaults:
+    _title: 'Restore Group'
+    _controller: '\Drupal\qwreporting\Controller\GroupController::restoreGroup'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE
+
+qwreporting.import_users:
+  path: '/admin/qwreporting/{group_id}/import'
+  defaults:
+    _title: 'Import Users'
+    _form: 'Drupal\qwreporting\Form\GroupImportUsersForm'
+  requirements:
+    _permission: 'access qwreporting'
+  options:
+    _admin_route: FALSE

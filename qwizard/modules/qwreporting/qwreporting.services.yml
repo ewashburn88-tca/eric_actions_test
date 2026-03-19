@@ -1,0 +1,10 @@
+services:
+  qwreporting.students:
+    class: Drupal\qwreporting\QwreportingStudents
+    arguments: []
+  qwreporting.groups:
+    class: Drupal\qwreporting\QwreportingGroups
+    arguments: ['@qwreporting.students']
+  qwreporting.group_ops:
+    class: Drupal\qwreporting\QwreportingGroupOps
+    arguments: ['@session_manager', '@module_handler', '@logger.factory', '@qwsubs.subscription_handler', '@qwizard.general', '@qwizard.membership']

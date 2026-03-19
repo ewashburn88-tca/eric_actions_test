@@ -1,0 +1,32 @@
+
+# Subscription menu items definition
+entity.subscription.collection:
+  title: 'Subscription list'
+  route_name: entity.subscription.collection
+  description: 'List Subscription entities'
+  parent: qwizard.admin_qwizard
+  weight: 99
+
+
+# Subscription type menu items definition
+entity.subscription_type.collection:
+  title: 'Subscription type'
+  route_name: entity.subscription_type.collection
+  description: 'List Subscription type (bundles)'
+  parent: qwizard.admin_qwizard
+  weight: 100
+
+
+# Subscription Term menu items definition
+entity.subterm.collection:
+  title: 'Subscription Term list'
+  route_name: entity.subterm.collection
+  description: 'List Subscription Term entities'
+  parent: qwizard.admin_qwizard
+  weight: 100
+
+subterm.admin.structure.settings:
+  title: 'Subscription Term settings'
+  description: 'Configure Subscription Term entities'
+  route_name: subterm.settings
+  parent: qwizard.admin_qwizard

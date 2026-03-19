@@ -1,0 +1,31 @@
+/**
+ * @file
+ * Styles for Quiz results.
+ *
+ */
+
+.qwiz-take-button {
+  border: #0e1a25 solid 2px;
+  padding: 5px;
+  margin: 30px;
+}
+
+.stats {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.pool-heading {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.pool-stat {
+  font-size: 1.3em;
+}
+
+caption {
+  margin-top: 20px;
+  font-size: 1.2em;
+  text-align: left;
+}

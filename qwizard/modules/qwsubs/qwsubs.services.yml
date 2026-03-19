@@ -1,0 +1,16 @@
+services:
+  qwsubs.subscription:
+    class: Drupal\qwsubs\Subscription
+    arguments: []
+  qwsubs.subterm:
+    class: Drupal\qwsubs\SubTerm
+    arguments: []
+  logger.channel.qwsubs:
+    parent: logger.channel_base
+    arguments: ['qwsubs']
+  qwsubs.subscription_handler:
+    class: Drupal\qwsubs\SubscriptionHandler
+  qwsubs.subscription_interface:
+    class: Drupal\qwsubs\Entity\SubscriptionInterface
+  qwsubs.subs_term_interface:
+    class: Drupal\qwsubs\Entity\SubTermInterface

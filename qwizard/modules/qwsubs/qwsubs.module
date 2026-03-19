@@ -1,0 +1,181 @@
+<?php
+
+/**
+ * @file
+ * Contains qwsubs.module.
+ */
+
+include 'includes/qwsubs.inc';
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwsubs_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the qwsubs module.
+    case 'help.page.qwsubs':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Quiz Wizard Subscriptions') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function qwsubs_theme() {
+  $theme                                  = [];
+  $theme['subscription']                  = [
+    'render element' => 'elements',
+    'file'           => 'subscription.page.inc',
+    'template'       => 'subscription',
+  ];
+  $theme['subscription_content_add_list'] = [
+    'render element' => 'content',
+    'variables'      => ['content' => NULL],
+    'file'           => 'subscription.page.inc',
+  ];
+  return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function qwsubs_theme_suggestions_subscription(array $variables) {
+  $suggestions         = [];
+  $entity              = $variables['elements']['#subscription'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'subscription__' . $sanitized_view_mode;
+  $suggestions[] = 'subscription__' . $entity->bundle();
+  $suggestions[] = 'subscription__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'subscription__' . $entity->id();
+  $suggestions[] = 'subscription__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function qwsubs_cron() {
+  // We find all the active subscriptions and deactivate them.
+  $config = \Drupal::service('config.factory')->getEditable('qwsubs.settings');
+  // Will print 'Hello'.
+  $last_expire_iso = empty($last_expire_iso = $config->get('last_expire_date')) ? '1970-01-01T07:00:00+07:00' : $last_expire_iso;
+  // Go to beginning of day, just to cover latency.
+  $date = new DateTime($last_expire_iso);
+  $date->setTime(0, 0);
+  $expired_subterms = qwsubs_get_expired_since_last_run($date->format('c'));
+  if (!empty($expired_subterms)) {
+    $queue_service = \Drupal::service('queue');
+    $queue         = $queue_service->get('deactivate_subscriptions');
+    foreach ($expired_subterms as $item) {
+      $queue->createItem($item);
+    }
+  }
+  $config->set('last_expire_date', date('c', time()))->save();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ */
+function qwsubs_subscription_update(\Drupal\Core\Entity\EntityInterface $entity) {
+  // Log if the subscription status has changed.
+  $status_now = $entity->isActive();
+  $status_orig = $entity->original->isActive();
+  $params = [
+    '@user' => $entity->getOwnerId(),
+    '@sub' => $entity->id(),
+  ];
+  if ($status_now != $status_orig) {
+    if ($status_orig < $status_now) {
+      \Drupal::logger('subscription')->error('Subscription @sub was activated for @user.', $params);
+    }
+    else {
+      \Drupal::logger('subscription')->notice('Subscription @sub deactivated for @user.', $params);
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function qwsubs_entity_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityType()->id() == 'user') {
+    $result = \Drupal::entityQuery("subscription")
+      ->condition('user_id', $entity->id(), '=')
+      ->execute();
+
+    $storage_handler = \Drupal::entityTypeManager()->getStorage("subscription");
+    $entities        = $storage_handler->loadMultiple($result);
+    $storage_handler->delete($entities);
+
+    $result = \Drupal::entityQuery("subterm")
+      ->condition('user_id', $entity->id(), '=')
+      ->execute();
+
+    $storage_handler = \Drupal::entityTypeManager()->getStorage("subterm");
+    $entities        = $storage_handler->loadMultiple($result);
+    $storage_handler->delete($entities);
+  }
+}
+
+/**
+ * If there is a subscription and it's active with a term then it needs expired.
+ *
+ * We don't want to mess around with any other subscription states.
+ *
+ * @return mixed
+ *   An array that has term ids.
+ */
+function qwsubs_get_expired_since_last_run($iso_date) {
+  $query = \Drupal::entityQuery('subterm')
+    ->condition('end', $iso_date, '>=')
+    ->condition('end', date('c', time()), '<');
+
+  $subterm_ids = $query->execute();
+  $memberships = \Drupal::entityTypeManager()->getStorage('subterm')->loadMultiple($subterm_ids);
+  foreach($memberships as $key=>$row) {
+    $row_id = $row->id();
+    $subscription_id = !empty($row->get('subscription_id')->getValue()) ? $row->get('subscription_id')->getValue()[0]['target_id'] : '';
+    #$user_id = !empty($row->get('user_id')->getValue()) ? $row->get('user_id')->getValue()[0]['target_id'] : '';
+    $course = null;
+    if(!empty($subscription_id)) {
+      $subscription = \Drupal::entityTypeManager()->getStorage('subscription')->load($subscription_id);
+      #$course = $subscription->get('course')->getValue()[0]['target_id'];
+
+      if (empty($subscription->status->value)) {
+        // The subscription is already inactive. Ignore this one
+        unset($subterm_ids[$row_id]);
+      }else {
+        // The subscription is active. Is there another subterm with a longer expiration attached to this subscription?
+        $query = \Drupal::entityQuery('subterm')
+          ->condition('end', date('c', time()), '>')
+          ->condition('subscription_id', $subscription->id())
+          ->condition('id', $row_id, '!=');
+        $extra_subterm_ids = $query->execute();
+
+        // A more recent subscription is attached. DONT un-publish the sub.
+        if(!empty($extra_subterm_ids)){
+          unset($subterm_ids[$row_id]);
+        }
+      }
+    }
+  }
+
+  return $subterm_ids;
+}
+

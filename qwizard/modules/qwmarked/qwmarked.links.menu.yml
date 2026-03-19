@@ -1,0 +1,10 @@
+entity.marked_question.settings:
+  title: marked_question
+  description: Configure a marked_question entity type
+  route_name:  entity.marked_question.settings
+  parent: system.admin_structure
+entity.marked_question.collection:
+  title: marked_questions
+  description: List of marked_questions
+  route_name: entity.marked_question.collection
+  parent: system.admin_content

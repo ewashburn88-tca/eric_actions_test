@@ -1,0 +1,21 @@
+/**
+ * @file
+ * Styles for test take form.
+ *
+ */
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
+.column {
+  padding: 20px;
+}
+
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.qwiz-actions-button {
+  padding: 20px;
+}

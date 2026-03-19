@@ -1,0 +1,5 @@
+marked_question.add_form:
+  route_name: entity.marked_question.add_form
+  title: 'Add marked_question'
+  appears_on:
+    - entity.marked_question.collection

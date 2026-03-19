@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Associations
+vid: associations
+description: 'Associated users, such as students with a common element'
+hierarchy: 0
+weight: -4

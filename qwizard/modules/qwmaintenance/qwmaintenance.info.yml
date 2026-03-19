@@ -1,0 +1,8 @@
+name: 'Qwizard Maintenance Module'
+type: module
+description: 'Maintenance functionality for Qwizard module.'
+core_version_requirement: ^9.2
+package: 'Education'
+configure: qwmaintenance.qw_maintenance_form
+dependencies:
+  - drupal:qwizard

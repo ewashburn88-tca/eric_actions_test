@@ -1,0 +1,14 @@
+name: 'Quiz Wizard Flashcards'
+type: module
+description: 'Flashcards Module'
+core_version_requirement: ^9.2
+package: Education
+dependencies:
+  - qwizard
+  - node
+  - text
+  - comment
+  - taxonomy
+  - path
+  - user
+  - menu_ui

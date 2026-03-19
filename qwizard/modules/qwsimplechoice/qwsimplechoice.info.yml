@@ -1,0 +1,13 @@
+name: 'Quiz Wizard Simple Choice Question Type'
+type: module
+description: 'Very simple multiple choice question type with single feedback and one correct answer worth one point.'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - qwizard
+  - node
+  - text
+  - comment
+  - taxonomy
+  - path
+  - user

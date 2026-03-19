@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: Topics
+vid: topics
+description: 'Topics are a categorization under Classes, which fall under Courses'
+hierarchy: 0
+weight: -8

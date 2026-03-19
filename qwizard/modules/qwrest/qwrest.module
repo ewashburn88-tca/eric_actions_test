@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Contains qwrest.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwrest_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the qwrest module.
+    case 'help.page.qwrest':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('REST Services for Quiz Wizard module') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+

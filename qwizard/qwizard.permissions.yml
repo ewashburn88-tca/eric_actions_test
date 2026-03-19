@@ -1,0 +1,125 @@
+administer qwizard:
+  title: 'Administer Quiz Wizard Module'
+
+add question pool entities:
+  title: 'Create new Question Pool entities'
+
+administer question pool entities:
+  title: 'Administer Question Pool entities'
+  description: 'Allow to access the administration form to configure Question Pool entities.'
+  restrict access: true
+
+delete question pool entities:
+  title: 'Delete Question Pool entities'
+
+edit question pool entities:
+  title: 'Edit Question Pool entities'
+
+view published question pool entities:
+  title: 'View published Question Pool entities'
+
+view unpublished question pool entities:
+  title: 'View unpublished Question Pool entities'
+
+view all question pool revisions:
+  title: 'View all Question Pool revisions'
+
+revert all question pool revisions:
+  title: 'Revert all Question Pool revisions'
+  description: 'Role requires permission <em>view Question Pool revisions</em> and <em>edit rights</em> for question pool entities in question or <em>administer question pool entities</em>.'
+
+delete all question pool revisions:
+  title: 'Delete all revisions'
+  description: 'Role requires permission to <em>view Question Pool revisions</em> and <em>delete rights</em> for question pool entities in question or <em>administer question pool entities</em>.'
+
+add quiz entities:
+  title: 'Create new Quiz entities'
+
+administer quiz entities:
+  title: 'Administer Quiz entities'
+  description: 'Allow to access the administration form to configure Quiz entities.'
+  restrict access: true
+
+delete quiz entities:
+  title: 'Delete Quiz entities'
+
+edit quiz entities:
+  title: 'Edit Quiz entities'
+
+view published quiz entities:
+  title: 'View published Quiz entities'
+
+view unpublished quiz entities:
+  title: 'View unpublished Quiz entities'
+
+view all quiz revisions:
+  title: 'View all Quiz revisions'
+
+revert all quiz revisions:
+  title: 'Revert all Quiz revisions'
+  description: 'Role requires permission <em>view Quiz revisions</em> and <em>edit rights</em> for quiz entities in question or <em>administer quiz entities</em>.'
+
+delete all quiz revisions:
+  title: 'Delete all revisions'
+  description: 'Role requires permission to <em>view Quiz revisions</em> and <em>delete rights</em> for quiz entities in question or <em>administer quiz entities</em>.'
+add quiz results entities:
+  title: 'Create new Quiz Results entities'
+
+administer quiz results entities:
+  title: 'Administer Quiz Results entities'
+  description: 'Allow to access the administration form to configure Quiz Results entities.'
+  restrict access: true
+
+delete quiz results entities:
+  title: 'Delete Quiz Results entities'
+
+edit quiz results entities:
+  title: 'Edit Quiz Results entities'
+
+view published quiz results entities:
+  title: 'View published Quiz Results entities'
+
+view unpublished quiz results entities:
+  title: 'View unpublished Quiz Results entities'
+add quiz snapshot entities:
+  title: 'Create new Quiz Snapshot entities'
+
+administer quiz snapshot entities:
+  title: 'Administer Quiz Snapshot entities'
+  description: 'Allow to access the administration form to configure Quiz Snapshot entities.'
+  restrict access: true
+
+delete quiz snapshot entities:
+  title: 'Delete Quiz Snapshot entities'
+
+edit quiz snapshot entities:
+  title: 'Edit Quiz Snapshot entities'
+
+view published quiz snapshot entities:
+  title: 'View published Quiz Snapshot entities'
+
+view unpublished quiz snapshot entities:
+  title: 'View unpublished Quiz Snapshot entities'
+
+add student record archive entities:
+  title: 'Create new Student Record Archive entities'
+
+administer student record archive entities:
+  title: 'Administer Student Record Archive entities'
+  description: 'Allow to access the administration form to configure Student Record Archive entities.'
+  restrict access: true
+
+delete student record archive entities:
+  title: 'Delete Student Record Archive entities'
+
+edit student record archive entities:
+  title: 'Edit Student Record Archive entities'
+
+view published student record archive entities:
+  title: 'View published Student Record Archive entities'
+
+view unpublished student record archive entities:
+  title: 'View unpublished Student Record Archive entities'
+
+permission_callbacks:
+  - \Drupal\qwizard\QwStudentResultsPermissions::generatePermissions

@@ -1,0 +1,12 @@
+services:
+  logger.channel.qwmaintenance:
+    parent: logger.channel_base
+    arguments: ['qwmaintenance']
+
+  pools.maintenance:
+    class: Drupal\qwmaintenance\PoolsMaintenanceService
+    arguments: ['@entity_type.manager', '@qwizard.general', '@qwizard.merged_qwiz', '@qwsubs.subscription_handler']
+
+  qwmaintenance.data_cleanup:
+    class: Drupal\qwmaintenance\QwDataCleanupManager
+    arguments: ['@database']

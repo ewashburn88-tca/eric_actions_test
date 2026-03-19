@@ -1,0 +1,23 @@
+qwmaintenance.qw_maintenance_form:
+  path: '/admin/qwizard/maintenance'
+  defaults:
+    _form: '\Drupal\qwmaintenance\Form\QwMaintenanceForm'
+    _title: 'Maintenance'
+  requirements:
+    _permission: 'administer zuku'
+
+qwmaintenance.qw_orphaned_data_cleanup:
+  path: '/admin/qwizard/maintenance/orphaned-data-cleanup'
+  defaults:
+    _form: '\Drupal\qwmaintenance\Form\QwOrphanedDataCleanupForm'
+    _title: 'Orphaned Data Cleanup'
+  requirements:
+    _permission: 'administer zuku'
+
+qwmaintenance.rebuild_pools_one_user:
+  path: '/admin/qwizard/maintenance/{uid}/pools'
+  defaults:
+    _title: 'Rebuild Pools'
+    _controller: '\Drupal\qwmaintenance\Controller\QWMaintenancePoolsOneUser::build'
+  requirements:
+    _permission: 'administer zuku'

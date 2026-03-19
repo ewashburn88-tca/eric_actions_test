@@ -1,0 +1,9 @@
+/**
+ * @file
+ * Styles for question form.
+ *
+ */
+
+.feedback-modal-hidden {
+  display: none;
+}

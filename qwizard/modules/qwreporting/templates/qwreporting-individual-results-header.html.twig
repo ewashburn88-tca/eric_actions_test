@@ -1,0 +1,30 @@
+<div class="qwreporting-individual-results-header">
+
+  {#  @todo  remove edit from this or make set on permissions #}
+  <div class="container">
+    <h3 class="float-left"><a
+        href="{{ url('qwreporting.group_edit', {'group' : group.id}) }}">{{ group.name }}</a>
+    </h3>
+    <div class="header-links float-right">
+      {% if is_admin %}
+        <a class="btn btn-secondary"
+           href="{{ path('qwmaintenance.qw_maintenance_form', {}, {'query': {'destination': path('<current>'), 'group_id' : group.id }}) }}">
+          {{ 'Student Maintenance'|t }}
+        </a>
+      {% endif %}
+      <a class="btn btn-secondary"
+         href="{{ url('qwreporting.group_email', {'group_id' : group.id}) }}">{{ 'Email Students' | t }}</a>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div>{{ group.description|raw }}</div>
+  {# <nav class="navbar navbar-light bg-light">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <!-- <li class="nav-item">
+          <a class="nav-link" href='/admin/qwreporting'>Groups</a><br/>
+      </li> -->
+
+    </ul>
+  </nav> #}
+
+</div>

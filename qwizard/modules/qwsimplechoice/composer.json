@@ -1,0 +1,14 @@
+{
+  "name": "drupal/qwsimplechoice",
+  "type": "drupal-module",
+  "description": "Very simple multiple choice question type with single feedback and one correct answer.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/qwsimplechoice",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/qwsimplechoice",
+    "source": "http://cgit.drupalcode.org/qwsimplechoice"
+  },
+  "require": { }
+}

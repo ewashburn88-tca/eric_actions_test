@@ -1,0 +1,28 @@
+uuid: 388260cb-bfb7-4d88-9f59-1b74c117af84
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_special_accommodations
+    - profile.type.qwizard_profile
+  module:
+    - profile
+third_party_settings:
+  profile:
+    profile_private: true
+id: profile.qwizard_profile.field_special_accommodations
+field_name: field_special_accommodations
+entity_type: profile
+bundle: qwizard_profile
+label: 'I qualify for special accommodations.'
+description: "By checking this box you will double your allowed test time, giving you longer to do timed questions.\r\nYou will have 2m 10s per question instead of 1m 5s."
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

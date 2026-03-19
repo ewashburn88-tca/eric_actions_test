@@ -1,0 +1,159 @@
+<?php
+
+/**
+ * @file
+ * Contains qwcommerce.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwcommerce_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the qwcommerce module.
+    case 'help.page.qwcommerce':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Quiz Wizard Commerce Functions') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+function qwcommerce_form_alter(&$form, &$form_state, $form_id) {
+  // Alters add to cart form
+  if (str_starts_with($form_id, 'commerce_order_item_add_to_cart_form_commerce_product')) {
+    // Alter titles inside the add to cart form, without this it just shows Term value
+    $variation_id = $form['purchased_entity']['widget'][0]['variation']['#value'];
+    $product_variation = \Drupal\commerce_product\Entity\ProductVariation::load($variation_id);
+    $prod = $product_variation->getProduct();
+    $all_variations = $prod->getVariations();
+    $type = $prod->bundle();
+    $is_premium = $prod->field_premium->value;
+    $currency_formatter = \Drupal::service('commerce_price.currency_formatter');
+    foreach ($all_variations as $key => $product_variation) {
+      if (!$product_variation->isPublished()) {
+        // Skip if not published.
+        continue;
+      }
+      $title = $product_variation->getTitle();
+
+      $raw_price = $product_variation->getPrice();
+      $price = explode('.', $currency_formatter->format($raw_price->getNumber(), 'USD'))[0];
+      $discounted_price = explode('.', $currency_formatter->format(($raw_price->getNumber() - 25), 'USD'))[0];
+
+      // Hardcoded coupon text
+      $coupon_text = '';
+      $product_ids_to_include_VETVANCE_coupon_text = [25, 28, 24];
+      if (in_array($prod->id(), $product_ids_to_include_VETVANCE_coupon_text)) {
+        $coupon_text = '<span class="vetvance-coupon-txt"> (' . $discounted_price . ' w/VetVance)</span>';
+      }
+
+      if ($prod->id() == 40) {
+        $msu_price = explode('.', $currency_formatter->format($raw_price->getNumber() + 100, 'USD'))[0];
+        $coupon_text .= '<br><span style="color: red;"> ' . t('Normally ') . $msu_price . t(' -- $100 subsidy courtesy MSU!') . '</span>';
+      }
+      if ($prod->id() == 45) {
+        $msu_price = explode('.', $currency_formatter->format($raw_price->getNumber() + 100, 'USD'))[0];
+        $coupon_text .= '<span style="color: red;"> ' . t(' (Special VCA Associate price!)') . '</span>';
+      }
+
+      if (!empty($form['purchased_entity']['widget'][0]['attributes']['attribute_term']['#options'])) {
+        // Adjust term text
+        $term_id = $product_variation->getAttributeValue('attribute_term')
+          ->id();
+        $original_text = $form['purchased_entity']['widget'][0]['attributes']['attribute_term']['#options'][$term_id];
+        $new_text = $original_text . ' - US' . $price;
+
+        if (!empty($coupon_text)) {
+          $new_text .= $coupon_text;
+        }
+
+        if ($type == 'course_extension') {
+          if ($is_premium) {
+            $new_text = t('Upgrade & Extend') . ' - ' . $new_text;
+          }
+          else {
+            $new_text = t('Extend') . ' - ' . $new_text;
+          }
+
+        }
+
+        // Add sale text.
+        // @todo Hard coding here needs to be made a setting - products sales.
+        $revert_navle_6 = new DateTime('06/15/2024');
+        $revert_vtne_3 = new DateTime('05/31/2024');
+        $sale_end = new DateTime('07/15/2024');
+        $now = new DateTime('now');
+        $nav3 = [91, 88];
+        $vtne6 = [99];
+        $vtne3 = [100];
+        $sale_products = array_merge($nav3, $vtne3, $vtne6);
+        // Check sale end date & sale products.
+        if ($sale_end > $now && in_array($product_variation->id(), $sale_products)) {
+          $sale_text = '<br>&nbsp;&nbsp;&nbsp; - <span style="color: red;font-weight: bold;">Auto-extends to 12/21/24!</span>';
+          // Show navle 6 prod because some people have coupons, but move it to
+          // last item and set 3m to default.
+          if (in_array($prod->id(), [25, 24]) && $now < $revert_navle_6) {
+            // Make 3m default.
+            $form["purchased_entity"]["widget"][0]["attributes"]["attribute_term"]["#default_value"] = 5;
+            // Move navle 6m to last opt during summer sale.
+            $six_m = $form["purchased_entity"]["widget"][0]["attributes"]["attribute_term"]["#options"][4];
+            unset($form["purchased_entity"]["widget"][0]["attributes"]["attribute_term"]["#options"][4]);
+            $form["purchased_entity"]["widget"][0]["attributes"]["attribute_term"]["#options"][4] = $six_m;
+          }
+          elseif ($product_variation->id() == 100 && $now < $revert_vtne_3) {
+            // Change sale text for vtne 3m as it reverts earlier.
+            $sale_text = '<br>&nbsp;&nbsp;&nbsp; - <span style="color: red;font-weight: bold;">Auto-extends to 8/30/24!</span>';
+          }
+          $new_text .= $sale_text;
+        }
+
+        // @todo: ZUKU-1785, remove after summer sale 2025. ********************
+        /*
+        $sale_text = [
+          87 => 'Buy 6 Mo, get 12!'. ' - US' . $price . $coupon_text,
+          88 => 'Buy 3 Mo, get 6!'. ' - US' . $price . $coupon_text,
+          90 => 'Buy 6 Mo, get 12!'. ' - US' . $price . $coupon_text,
+          91 => 'Buy 3 Mo, get 6!'. ' - US' . $price . $coupon_text,
+        ];
+        if (!empty($sale_text[$product_variation->id()])) {
+          $new_text = $sale_text[$product_variation->id()];
+        }
+        */
+        // End zuku-1785 *******************************************************
+
+        $form['purchased_entity']['widget'][0]['attributes']['attribute_term']['#options'][$term_id] = $new_text;
+      }
+      else {
+        // Term not available for this product, premium upgrade. Give it text to
+        // display price.
+        $form['qwcommerce_price_display'] = [
+          '#type' => 'fieldset',
+        ];
+        $form['qwcommerce_price_display']['qwcommerce_price'] = [
+          '#type'          => 'radios',
+          '#default_value' => 1,
+          '#options'       => [1 => t('Premium Upgrade') . ' - ' . $price . $coupon_text],
+        ];
+      }
+    }
+
+    // Premium upgrades say "Add to cart", change it to "Sign up"
+    $submit_text = $form['actions']['submit']['#value']->__toString();
+    if ($submit_text == 'Add to cart') {
+      $form['actions']['submit']['#value'] = t('Sign up');
+    }
+  }
+
+  // Alters /cart
+  if (str_starts_with($form_id, 'views_form_commerce_cart_form_default_')) {
+    // Hide the submit button, since quantity updating isn't enabled
+    if (!empty($form['actions']['submit'])) {
+      unset($form['actions']['submit']);
+    }
+  }
+}

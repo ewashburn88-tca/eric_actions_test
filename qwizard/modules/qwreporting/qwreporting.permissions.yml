@@ -1,0 +1,4 @@
+access qwreporting:
+  title: 'Access reports from groups'
+  description: ''
+  restrict access: true

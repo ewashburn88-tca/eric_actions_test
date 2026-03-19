@@ -15,4 +15,4 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run PHPCS script
-        run: ./.github/scripts/phpcs_run.sh
+        run: ./scripts/phpcs_run.sh

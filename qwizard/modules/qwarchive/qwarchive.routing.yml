@@ -1,0 +1,58 @@
+qwarchive.qw_user_list:
+  path: '/admin/qwizard/qw-archive/users'
+  defaults:
+    _title: 'Inactive Users'
+    _form: 'Drupal\qwarchive\Form\QwizardArchiveInactiveUsersForm'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.qw_archive_list:
+  path: '/admin/qwizard/qw-archive/list'
+  defaults:
+    _title: 'Archived Records'
+    _controller: 'Drupal\qwarchive\Controller\QwArchiveList::buildList'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.qw_restore_requests_list:
+  path: '/admin/qwizard/qw-archive/restore-requests'
+  defaults:
+    _title: 'Restore Requests'
+    _controller: 'Drupal\qwarchive\Controller\QwRestoreRequests::buildList'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.create_form:
+  path: '/admin/qwizard/qw-archive/create'
+  defaults:
+    _title: 'Create Archive'
+    _form: 'Drupal\qwarchive\Form\QwizardArchiveCreateForm'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.settings:
+  path: '/admin/qwizard/qw-archive/settings'
+  defaults:
+    _form: '\Drupal\qwarchive\Form\QwArchiveSettingsForm'
+    _title: 'QW Archive Settings'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.storage_settings:
+  path: '/admin/qwizard/qw-archive/storage-settings'
+  defaults:
+    _form: '\Drupal\qwarchive\Form\QwArchiveStorageSettingsForm'
+    _title: 'QW Archive Storage'
+  requirements:
+    _permission: 'administer qwizard archive'
+
+qwarchive.restore:
+  path: '/admin/qwizard/qw-archive/{account}/{type}/restore'
+  defaults:
+    _controller: '\Drupal\qwarchive\Controller\QwArchiveRestore::restore'
+  requirements:
+    _permission: 'administer qwizard archive'
+  options:
+      parameters:
+        user:
+          type: entity:account

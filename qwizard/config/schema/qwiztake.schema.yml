@@ -1,0 +1,40 @@
+qwizard.qwiztake:
+  type: config_entity
+  label: 'Qwiztake'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    back: 
+      type: string
+      label: 'Back'
+    next:
+      type: string
+      label: 'next'
+    mark:
+      type: string
+      label: 'mark'
+    report_a_problem:
+      type: string
+      label: 'report_a_problem'
+    overview:
+      type: string
+      label: 'overview'
+    lab_values:
+      type: string
+      label: 'lab_values'
+    complete_test:
+      type: string
+      label: 'complete_test'
+    question_number:
+      type: string
+      label: 'question_number'
+    score:
+      type: string
+      label: 'score'
+

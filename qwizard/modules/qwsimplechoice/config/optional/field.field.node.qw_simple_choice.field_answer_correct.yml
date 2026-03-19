@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+  - field.storage.node.field_answer_correct
+  - node.type.qw_simple_choice
+  module:
+  - qwsimplechoice
+id: node.qw_simple_choice.field_answer_correct
+field_name: field_answer_correct
+entity_type: node
+bundle: qw_simple_choice
+label: 'Answer Correct'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: qw_simple_answer_field

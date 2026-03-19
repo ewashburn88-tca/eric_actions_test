@@ -1,0 +1,41 @@
+entity.qwpool.add_form:
+  route_name: entity.qwpool.add_page
+  title: 'Add Question Pool'
+  appears_on:
+    - entity.qwpool.collection
+
+entity.qwpool_type.add_form:
+  route_name: entity.qwpool_type.add_form
+  title: 'Add Question Pool type'
+  appears_on:
+    - entity.qwpool_type.collection
+
+entity.qwiz.add_form:
+  route_name: entity.qwiz.add_page
+  title: 'Add Quiz'
+  appears_on:
+    - entity.qwiz.collection
+
+entity.qwiz_type.add_form:
+  route_name: entity.qwiz_type.add_form
+  title: 'Add Quiz type'
+  appears_on:
+    - entity.qwiz_type.collection
+
+entity.qwiz_result.add_form:
+  route_name: entity.qwiz_result.add_form
+  title: 'Add Quiz Results'
+  appears_on:
+    - entity.qwiz_result.collection
+
+entity.qw_student_results_type.add_form:
+  route_name: entity.qw_student_results_type.add_form
+  title: 'Add Qw student results type'
+  appears_on:
+    - entity.qw_student_results_type.collection
+
+entity.qw_student_results.add_form:
+  route_name: entity.qw_student_results.add_page
+  title: 'Add Student Results'
+  appears_on:
+    - entity.qw_student_results.collection

@@ -1,0 +1,22 @@
+{#
+/**
+ * @file qwiz_result.html.twig
+ * Default theme implementation to present Quiz Results data.
+ *
+ * This template is used when viewing Quiz Results pages.
+ *
+ *
+ * Available variables:
+ * - content: A list of content items. Use 'content' to print all content, or
+ * - attributes: HTML attributes for the container element.
+ *
+ * @see template_preprocess_qwiz_result()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('qwiz_result') }}>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

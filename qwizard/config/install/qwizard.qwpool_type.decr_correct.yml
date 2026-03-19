@@ -1,0 +1,5 @@
+langcode: en
+status: true
+dependencies: {  }
+id: decr_correct
+label: "Decrements on questions answered correctly."

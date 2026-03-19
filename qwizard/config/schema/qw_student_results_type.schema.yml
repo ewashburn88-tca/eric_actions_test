@@ -1,0 +1,12 @@
+qwizard.qw_student_results_type.*:
+  type: config_entity
+  label: 'Qw student results type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string

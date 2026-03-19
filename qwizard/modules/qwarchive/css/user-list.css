@@ -1,0 +1,14 @@
+.user-items-form-wrapper {
+  float: right;
+}
+
+.user-items-form-wrapper .form-item-items-per-page label,
+.user-items-form-wrapper .form-item-items-per-page input {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.user-items-form-wrapper input.form-submit {
+  margin-top: 9px;
+  margin-right: 0;
+}

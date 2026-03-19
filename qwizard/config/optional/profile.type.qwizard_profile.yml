@@ -1,0 +1,24 @@
+uuid: c522475b-1ab4-4b40-97c2-6ad5d7efb42e
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.customer_profile_type
+  module:
+    - commerce
+third_party_settings:
+  commerce_order:
+    customer_profile_type: false
+id: qwizard_profile
+label: 'Qwizard Profile'
+display_label: Testing
+multiple: false
+registration: false
+roles:
+  navle: navle
+  bcse: bcse
+  vtne: vtne
+  navle_premium: navle_premium
+  bcse_premium: bcse_premium
+allow_revisions: false
+new_revision: false

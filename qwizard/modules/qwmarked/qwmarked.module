@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * @file
+ * Provides a marked_question entity type.
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_theme().
+ */
+function qwmarked_theme() {
+  return [
+    'marked_question' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for marked_question templates.
+ *
+ * Default template: marked-question.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the marked_question information and any
+ *     fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_marked_question(array &$variables) {
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function qwmarked_entity_delete(\Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityType()->id() == 'user') {
+    // @todo: make sure user's marked records get deleted if user is deleted.
+
+  }
+}
+
+/**
+ * Designed to be ran from qwmarked_update_9001 or from /devel/php
+ * Will add cron workers for every user to handle defaults on marked questions that are null
+ * @param $uid
+ * @return void
+ */
+function _qwmarked_setMarkedQuestionDefaultsForAllUsers($uid = null) {
+  // Debug line, used to empty courses entirely
+  //$query = \Drupal::database()->update('marked_question_field_data')->fields(['course' => null])->execute();
+  \Drupal::service('cache_tags.invalidator')->invalidateTags(['marked_question_list']);
+
+  $queue_service = \Drupal::service('queue');
+  $queue = $queue_service->get('setMarkedQuestionCourseWhereNullForUser_QueueWorker');
+
+  if(!empty($uid)){
+    $uids = [$uid];
+  }else {
+    $uids = [];
+    $con   = \Drupal\Core\Database\Database::getConnection();
+    $query = $con->select('marked_question_field_data', 'mq');
+    $query->fields('mq', ['id', 'course', 'uid']);
+    $query->isNull('mq.course');
+    $marked_questions_with_null_course = $query->execute()->fetchAll(\PDO::FETCH_OBJ);
+    foreach($marked_questions_with_null_course as $marked_question){
+      if(empty($marked_question->course)){
+        $marked_question_uid = $marked_question->uid;
+        $uids[$marked_question_uid] = $marked_question_uid;
+      }
+    }
+  }
+
+  foreach($uids as $uid) {
+    $queue->createItem(['uid' => $uid]);
+  }
+}
+

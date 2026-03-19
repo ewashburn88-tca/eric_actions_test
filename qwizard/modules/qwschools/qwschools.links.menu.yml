@@ -1,0 +1,17 @@
+
+# School menu items definition
+entity.school.collection:
+  title: 'School list'
+  route_name: entity.school.collection
+  description: 'List School entities'
+  parent: system.admin_structure
+  weight: 100
+
+
+# School type menu items definition
+entity.school_type.collection:
+  title: 'School type'
+  route_name: entity.school_type.collection
+  description: 'List School type (bundles)'
+  parent: system.admin_structure
+  weight: 99

@@ -1,0 +1,10 @@
+name: 'QWizard - Quiz Wizard'
+type: module
+description: 'Module to create, administer and track quizzes and quiz results.'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - jsonb
+  - profile
+  - taxonomy
+  - options

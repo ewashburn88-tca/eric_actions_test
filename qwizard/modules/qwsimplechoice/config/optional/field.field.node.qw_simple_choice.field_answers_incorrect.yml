@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+  - field.storage.node.field_answers_incorrect
+  - node.type.qw_simple_choice
+  module:
+  - qwsimplechoice
+id: node.qw_simple_choice.field_answers_incorrect
+field_name: field_answers_incorrect
+entity_type: node
+bundle: qw_simple_choice
+label: 'Answers Incorrect'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: qw_simple_answer_field

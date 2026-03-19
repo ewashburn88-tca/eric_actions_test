@@ -1,0 +1,10 @@
+qwmaintenance.qw_maintenance_form:
+  route_name: qwmaintenance.qw_maintenance_form
+  base_route: qwmaintenance.qw_maintenance_form
+  title: 'Maintenance'
+
+qwmaintenance.qw_orphaned_data_cleanupt:
+  route_name: qwmaintenance.qw_orphaned_data_cleanup
+  base_route: qwmaintenance.qw_maintenance_form
+  title: 'Orphaned Data Cleanup'
+  weight: 95

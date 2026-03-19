@@ -1,0 +1,13 @@
+administer marked_question:
+  title: 'Administer marked_question settings'
+  restrict access: true
+access marked_question overview:
+  title: 'Access marked_question overview page'
+delete marked_question:
+  title: Delete marked_question
+create marked_question:
+  title: Create marked_question
+view marked_question:
+  title: View marked_question
+edit marked_question:
+  title: Edit marked_question

@@ -1,0 +1,7 @@
+name: 'Quiz Wizard Subscriptions'
+type: module
+description: 'Ties in commerce for qwsubs module.'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - qwsubs

@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Contains qwreporting.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function qwreporting_help($route_name, RouteMatchInterface $route_match)
+{
+	switch ($route_name) {
+		// Main module help for the qwreporting module.
+		case 'help.page.qwreporting':
+			$output = '';
+			$output .= '<h3>' . t('About') . '</h3>';
+			$output .= '<p>' . t('Student reporting module.') . '</p>';
+			return $output;
+
+		default:
+	}
+}
+
+  /**
+ * Implements hook_theme().
+ */
+function qwreporting_theme() {
+  return [
+    'qwreporting_homepage' => [
+      'variables' => [
+        'groups' => [],
+        'school' => NULL,
+      ],
+    ],
+    'qwreporting_individual_results' => [
+      'variables' => [
+        'students' => [],
+        'group'=> NULL,
+        'course'=> NULL,
+        'selected_topic' => NULL,
+        'filter' => NULL,
+        'show_all_topics_in_table' => NULL,
+        'topics' => NULL,
+        'is_primary_course' => NULL,
+        'selected_class' => NULL,
+        'selected_topic_id' => NULL,
+        'selected_qwiz_id' => NULL,
+        'query_params' => NULL,
+        'is_timed_test_mode' => NULL,
+      ],
+    ],
+    'qwreporting_individual_results_header' => [
+      'variables' => [
+        'query_params' => NULL,
+        'students' => [],
+        'group'=> NULL,
+        'course'=> NULL,
+        'selected_topic' => NULL,
+        'filter' => NULL,
+        'is_primary_course' => NULL,
+        'selected_class' => NULL,
+      ],
+    ],
+    'qwreporting_student_details' => [
+      'variables' => [
+        'details' => [],
+      ],
+    ],
+  ];
+}
+
+
+function qwreporting_form_alter(&$form, $form_state, $form_id){
+  if($form_id == 'qwreporting_group_results'){
+    // remove these so they don't get set on GET submissions
+    $form['form_id']['#access'] = FALSE;
+    $form['form_token']['#access'] = FALSE;
+    $form['form_build_id']['#access'] = FALSE;
+  }
+}
+
+
+function QwReportingGroupResultsFormOptionSort($a, $b)
+{
+  if($a == 'Total'){
+    return -1;
+  }
+  if ($a == $b) {
+    return 0;
+  }
+  return ($a < $b) ? -1 : 1;
+}

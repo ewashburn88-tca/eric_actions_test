@@ -1,0 +1,30 @@
+qwarchive.qw_user_list:
+  title: Users
+  parent: qwizard.admin_qwizard
+  description: 'Manage qwizard archives.'
+  route_name: qwarchive.qw_user_list
+
+qwarchive.qw_archive_list:
+  title: Archive List
+  parent: qwarchive.qw_user_list
+  description: 'Manage qwizard archives.'
+  route_name: qwarchive.qw_archive_list
+
+qwarchive.qw_restore_requests_list:
+  title: Restore Requests
+  parent: qwarchive.qw_user_list
+  description: 'Manage qwizard archives.'
+  route_name: qwarchive.qw_restore_requests_list
+
+qwarchive.create_form:
+  title: Create new
+  parent: qwarchive.qw_user_list
+  description: 'Create new qwizard archive.'
+  route_name: qwarchive.create_form
+
+qwarchive.storage_settings:
+  title: Storage settings
+  parent: qwarchive.qw_user_list
+  description: 'Storage settings for qwizard archive.'
+  route_name: qwarchive.storage_settings
+  weight: 99

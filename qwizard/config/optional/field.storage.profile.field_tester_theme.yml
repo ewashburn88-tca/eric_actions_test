@@ -1,0 +1,30 @@
+uuid: 218e77fe-c583-4518-9a62-4e8c3aff45ea
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - profile
+id: profile.field_tester_theme
+field_name: field_tester_theme
+entity_type: profile
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: tester-theme-light
+      label: Light
+    -
+      value: tester-theme-dark
+      label: Dark
+    -
+      value: tester-theme-stealth
+      label: Stealth
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * QWizard Admin (qwadmin) module.
+ *
+ * Provides admin utilities for QWizard.
+ */
+
+/**
+ * Implements hook_views_pre_render().
+ *
+ * Drops duplicate rows for a specific view+display combination where the visible
+ * field output is identical (excluding operations).
+ *
+ * This is useful when Views relationships create duplicate rows that look
+ * exactly the same to the user (e.g., filtering by class results in multiple
+ * identical rows per node).
+ */
+function qwadmin_views_pre_render(\Drupal\views\ViewExecutable $view) : void {
+  // Target only this view.
+  if ($view->id() !== 'content_no_grouping') {
+    return;
+  }
+
+  // Target only these displays.
+  $display_id = $view->current_display ?? '';
+  if (!in_array($display_id, ['page_8', 'data_export_1'], TRUE)) {
+    return;
+  }
+
+  // Safety: no results to process.
+  if (empty($view->result) || !is_array($view->result)) {
+    return;
+  }
+
+  // Field IDs to ignore when computing "duplicate-ness".
+  // User requested to ignore operations; keep this list extensible.
+  $ignore_field_ids = ['operations', 'field_editor_quiz_tags'];
+
+  // Build a stable "signature" for each row based on rendered field output.
+  // We render using the field handlers so the signature matches what's visible
+  // (links/labels/etc), then normalize by stripping tags/whitespace.
+  $seen = [];
+  $deduped = [];
+
+  foreach ($view->result as $row) {
+    $parts = [];
+
+    if (!empty($view->field) && is_array($view->field)) {
+      foreach ($view->field as $field_id => $handler) {
+        if (in_array($field_id, $ignore_field_ids, TRUE)) {
+          continue;
+        }
+
+        // Render field output for this row.
+        try {
+          $rendered = $handler->advancedRender($row);
+        }
+        catch (\Throwable $e) {
+          // Fall back if a handler doesn't support advancedRender().
+          try {
+            $rendered = $handler->render($row);
+          }
+          catch (\Throwable $e2) {
+            $rendered = '';
+          }
+        }
+
+        // Normalize: strip HTML, decode entities, collapse whitespace.
+        $normalized = strip_tags((string) $rendered);
+        $normalized = \Drupal\Component\Utility\Html::decodeEntities($normalized);
+        $normalized = preg_replace('/\s+/u', ' ', trim($normalized));
+
+        $parts[] = $field_id . '=' . $normalized;
+      }
+    }
+    else {
+      // If for some reason field handlers aren't available, fall back to nid.
+      // This is less strict than "all columns same" but prevents explosions.
+      $nid = $row->nid ?? '';
+      $parts[] = 'nid=' . $nid;
+    }
+
+    $signature = hash('sha256', implode('|', $parts));
+
+    if (!isset($seen[$signature])) {
+      $seen[$signature] = TRUE;
+      $deduped[] = $row;
+    }
+  }
+
+  // Replace the results array with de-duplicated results.
+  $view->result = $deduped;
+}

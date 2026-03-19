@@ -1,0 +1,53 @@
+
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+
+/**
+ * Update 9001 - Adding Course Field for Marked Questions
+ */
+
+ function qwmarked_update_9001()
+ {
+
+     $definition = BaseFieldDefinition::create('entity_reference')
+     ->setLabel(t('Course'))
+     ->setDescription(t('The Course of the Marked Qs entity.'))
+     ->setCardinality(1)
+     ->setSetting('target_type', 'taxonomy_term')
+     ->setSetting('handler', 'default:taxonomy_term')
+     ->setSetting('handler_settings',
+       [
+         'target_bundles' => [
+           'courses' => 'courses',
+         ],
+       ])
+     ->setDisplayOptions('view', [
+       'label'  => 'hidden',
+       'type'   => 'author',
+       'weight' => 0,
+     ])
+     ->setDisplayOptions('form', [
+       'type'     => 'entity_reference_autocomplete',
+       'weight'   => 3,
+       'settings' => [
+         'match_operator'    => 'CONTAINS',
+         'size'              => '10',
+         'autocomplete_type' => 'tags',
+         'placeholder'       => '',
+       ],
+     ])
+     ->setDisplayConfigurable('form', TRUE)
+     ->setDisplayConfigurable('view', TRUE);
+
+   \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('course', 'marked_question', null, $definition);
+
+   // Taking this out of code, but should be ran manually after deploy from /devel/php
+   //_qwmarked_setMarkedQuestionDefaultsForAllUsers();
+ }
+

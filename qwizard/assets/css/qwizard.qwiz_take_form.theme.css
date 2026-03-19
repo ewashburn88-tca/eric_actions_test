@@ -1,0 +1,50 @@
+/**
+ * @file
+ * Styles for test take form.
+ *
+ */
+
+.question-text {
+  margin-bottom: 25px;
+  font-size: 1.2em;
+  font-weight: bolder;
+}
+
+.feedback {
+  font-size: 1.1em;
+  font-weight: bold;
+  border: #008aa7 solid 1px;
+  padding: 10px;
+}
+
+.correct {
+  color: green;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: red;
+  font-weight: bold;
+}
+
+.not-chosen {
+  color: #888888;
+}
+
+.choice-indicator {
+  font-weight: bolder;
+  font-style: italic;
+}
+
+input[type*='submit'].current-question {
+  background: #777777;
+}
+input[type*='submit'].correct-question {
+  color: green;
+}
+input[type*='submit'].skipped-question {
+  color: yellow;
+}
+input[type*='submit'].incorrect-question {
+  color: red;
+}

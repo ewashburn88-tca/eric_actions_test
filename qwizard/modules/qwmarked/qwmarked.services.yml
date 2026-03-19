@@ -1,0 +1,4 @@
+services:
+  qwmarked.setMarkedQuestionDefaultClass:
+    class: Drupal\qwmarked\SetMarkedQuestionDefaultClass
+    arguments: ['@qwizard.general', '@qwsubs.subscription_handler']

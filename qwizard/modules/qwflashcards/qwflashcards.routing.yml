@@ -1,0 +1,46 @@
+qwflashcards.main:
+  path: "/navle/flashcards"
+  defaults:
+    _controller: '\Drupal\qwflashcards\Controller\FlashcardsController::main'
+    _title: "Flashcards"
+  requirements:
+    _permission: "access content"
+
+qwflashcards.bcse_main:
+  path: "/bcse/flashcards"
+  defaults:
+    _controller: '\Drupal\qwflashcards\Controller\FlashcardsController::main'
+    _title: "Flashcards"
+  requirements:
+    _permission: "access content"
+
+qwflashcards.detail:
+  path: "/navle/flashcard/{flashcard}"
+  defaults:
+    _controller: '\Drupal\qwflashcards\Controller\FlashcardsController::flashcard'
+    _title: "Flashcards"
+  requirements:
+    _permission: "access content"
+
+qwflashcards.bcse_detail:
+  path: "/bcse/flashcard/{flashcard}"
+  defaults:
+    _controller: '\Drupal\qwflashcards\Controller\FlashcardsController::flashcard'
+    _title: "Flashcards"
+  requirements:
+    _permission: "access content"
+
+qwflashcards.updateMarkedQuestions:
+  path: "admin/marked-question/update-marked"
+  defaults:
+    _title: "Update Marked Questions to Marked Cards"
+    _controller: '\Drupal\qwflashcards\Controller\MarkedQuestionController::updateMarkedQuestions'
+  requirements:
+    _permission: "administer zuku"
+qwflashcards.updateMarkedQuestions_form:
+  path: '/admin/marked-question/update-marked-form'
+  defaults:
+    _form: '\Drupal\qwflashcards\Form\UpdateMarkedQuestionsForm'
+    _title: 'UpdateMarkedQuestionsForm'
+  requirements:
+    _permission: 'administer zuku'

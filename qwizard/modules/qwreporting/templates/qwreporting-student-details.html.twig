@@ -1,0 +1,258 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display something.
+ *
+ * Available variables:
+ * - foo: Foo variable description.
+ *
+ * @see template_preprocess_qwreporting_student_details()
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% set modal_snapshots = [] %}
+<div class="wrapper-class zr-qw-reporting-student-details-wrapper">
+  <p class="details-header">{{ 'Student ID'|t }}: {{ details.uid }}&nbsp;&nbsp; |
+    &nbsp;&nbsp;{{ 'Email'|t }}: {{ details.email }}&nbsp;&nbsp; |
+    &nbsp;&nbsp;{{ 'Course'|t }}: {{ details.coursename }}
+    {% if details.show_masquerade %}
+      &nbsp;&nbsp; | &nbsp;&nbsp;<a href='{{ url('entity.user.masquerade', {'user' : details.uid}) }}'>{{ 'Masquerade'|t }}</a>
+    {% endif %}
+    </p>
+  <p></p>
+  {# <p>Username: <a href="{{ url('zuku_user_edit_profile', {'uid' : details.uid}) }}">{{ details.username }}</a></p> #}
+  {# <p>{{ 'Username'|t }}:{{ details.username }}</p> #}
+  {# <p>{{ 'Name'|t }}: {{ details.real_name }}</p> #}
+  {# <p>{{ 'Subscription History for course'|t }}: {{ details.coursename }}</p> #}
+  <nav class="navbar navbar-light bg-light">
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <li class="nav-item">
+        <a class="nav-link"
+           href='{{ url('qwreporting.excel.details', {'course': details.courseid,'student' : details.uid}) }}'>{{ 'Download table'|t }}</a>
+      </li>
+      {% if is_admin %}
+        <li class="nav-item">
+          <a class="nav-link"
+             href='{{ url('zuku_user_edit_profile', {'uid' : details.uid}) }}'>{{ 'Edit User'|t }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href='{{ url('zuku_user_membership_home', {'uid' : details.uid}) }}'>{{ 'Membership Manager'|t }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href='{{ url('zukuuser.masquarade', {'uid' : details.uid}) }}'>{{ 'Masquerade as this user'|t }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link"
+             href="{{ path('qwmaintenance.qw_maintenance_form', {}, {'query': {'destination': path('<current>'), 'user_id' : details.uid }}) }}">
+            {{ 'Student Maintenance'|t }}
+          </a>
+        </li>
+      {% else %}
+        {% for class_id, data in details.data %}
+          {% set table_id_key = "zr-table-data-#{class_id}-#{data.classes.name}"|clean_class %}
+          {% if data.classes.name != "" and data.results %}
+            <li class="nav-item">
+              <a class="nav-link"
+                 href="#{{ table_id_key }}">{{ data.classes.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {% if not details.include_snapshots %}
+        {# <li class="nav-item">
+              <a class="nav-link" href='{{ url('qwreporting.student.details', {'course': details.courseid, 'student' : details.uid}) }}?include_snapshots'>{{ 'View Snapshots'|t }}</a>
+            </li> #}
+      {% endif %}
+    </ul>
+  </nav>
+  {% if is_admin %}
+    <nav class="tabs">
+      <ul class="nav nav-tabs primary">
+        {% for class_id, data in details.data %}
+          {% set table_id_key = "zr-table-data-#{class_id}-#{data.classes.name}"|clean_class %}
+          {% if data.classes.name != "" and data.results %}
+            <li class="nav-item">
+              <a class="nav-link"
+                 href="#{{ table_id_key }}">{{ data.classes.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+  {% endif %}
+  {% for class_id, data in details.data %}
+    {% if data.classes.name != "" and data.results %}
+      {% set progress_bg = 'bg-primary' %}
+      {% if('test mode' in data.classes.name|lower) %}
+        {% set progress_bg = 'bg-success' %}
+      {% endif %}
+
+      {% set table_id_key = "zr-table-data-#{class_id}-#{data.classes.name}"|clean_class %}
+      <h2 id={{ table_id_key }}>{{ data.classes.name }} <span class="bcse"
+                                                              style="float: right">{{ details.real_name }}</span>
+      </h2>
+      {% if data.classes.description_processed %}
+        {{ data.classes.description_processed }}
+      {% endif %}
+      <table class="table">
+        <thead>
+        <tr>
+          <th>{{ 'Name'|t }}</th>
+          <th>{{ 'Total'|t }}</th>
+          <th>{{ 'Correct'|t }}</th>
+          <th>{{ 'Progress'|t }}</th>
+          <th>{{ 'Score'|t }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {# {{ dump(data.classes.qwizzes) }}
+                 {{ dump(data.results) }} #}
+
+        {% for qwiz_result in data.results %}
+          {# {{ dd(qwiz_result) }} #}
+          <tr>
+            {% if qwiz_result.snapshots %}
+              {# This result has snapshot information available for it, array_merge modal data & create link #}
+              {% set modal_key = "snapshots-#{class_id}-#{qwiz_result.id}" %}
+              <td><a href="#" data-toggle="modal"
+                     data-target="#{{ modal_key }}">{{ qwiz_result.label }}
+              </td></a>
+              {% set modal_snapshots = modal_snapshots|merge({ (modal_key): {'label':qwiz_result.label, 'id':qwiz_result.id, 'class':data.classes.name, 'snapshots':qwiz_result.snapshots} }) %}
+            {% elseif data.snapshots and loop.index == 1 %}
+              {# Used to set the lighbox on the first available result, if topic breakdown is unavailable #}
+              {% set modal_key = "snapshots-#{class_id}-#{data.classes.class_id}" %}
+              <td><a href="#" data-toggle="modal"
+                     data-target="#{{ modal_key }}">{{ qwiz_result.label }}
+              </td></a>
+              {% set modal_snapshots = modal_snapshots|merge({ (modal_key): {'progress_bg':progress_bg, 'label':data.classes.name, 'id':data.classes.class_id, 'class':data.classes.name, 'snapshots':data.snapshots} }) %}
+            {% else %}
+              <td>{{ qwiz_result.label }}</td>
+            {% endif %}
+            <td>{{ qwiz_result.total_questions }}</td>
+            <td>{{ qwiz_result.actually_correct|number_format }}</td>
+
+            <td>{{ qwiz_result.score_all|number_format(3) * 100 }}%
+              ({{ qwiz_result.correct|number_format }}
+              /{{ qwiz_result.total_questions|number_format }})
+              <div class="progress progress-striped active">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated progress-bar-primary {{ progress_bg }}"
+                  role="progressbar"
+                  style="width:{{ qwiz_result.score_all|number_format(3) * 100 }}%;display: block; float: left;"
+                  aria-valuenow="{{ qwiz_result.score_all|number_format(3) * 100 }}"
+                  aria-valuemin="0" aria-valuemax="100">
+                </div>
+              </div>
+            </td>
+            <td>{{ qwiz_result.score_attempted|number_format(3) * 100 }}%
+              ({{ qwiz_result.actually_correct|number_format }}
+              /{{ qwiz_result.attempted|number_format }})
+            </td>
+          </tr>
+        {% endfor %}
+        {#
+        {% for qwizz in data.classes.qwizzes %}
+            <tr>
+                <td>{{ qwizz.name }}</td>
+              <td>{{ qwizz.total_questions }}</td>
+                {% if data.results[qwizz.name] %}
+                  <td>{{ data.results[qwizz.name].correct|number_format }}</td>
+
+                  <td>{{ data.results[qwizz.name].score_all|number_format(3) * 100 }}% ({{ data.results[qwizz.name].correct|number_format }}/{{ data.results[qwizz.name].total_questions|number_format }})</td>
+                  <td>{{ data.results[qwizz.name].score_seen|number_format(3) * 100 }}% ({{ data.results[qwizz.name].correct|number_format }}/{{ data.results[qwizz.name].seen|number_format }})</td>
+
+                {% else %}
+                    <td>-</td>
+                    <td>-</td>
+                    <td>0%</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+
+      {% if(data.results['Total']) %}
+        <td>Total</td>
+        <td>{{ data.results['Total'].total_questions|number_format }}</td>
+        <td>{{ data.results['Total'].correct|number_format }}</td>
+        <td>{{ data.results['Total'].score_all|number_format(3) * 100 }}% ({{ data.results['Total'].correct|number_format }}/{{ data.results['Total'].total_questions|number_format }})</td>
+        <td>{{ data.results['Total'].score_seen|number_format(3) * 100 }}% ({{ data.results['Total'].correct|number_format }}/{{ data.results['Total'].seen|number_format }})</td>
+      {% endif %}
+      </tbody> #}
+      </table>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{# The hidden modals #}
+{# {{ dump(modal_snapshots) }} #}
+{% for key,modal_snapshot in modal_snapshots %}
+  <div class="modal fade" id="{{ key }}" tabindex="-1" role="dialog"
+       aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-notify modal-info" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="heading">{{ 'Sessions for'|t }} {{ modal_snapshot.label }}
+            {% if modal_snapshot.class != modal_snapshot.label %}
+              {{ 'in'|t }} {{ modal_snapshot.class }}
+            {% endif %}
+          </h3>
+        </div>
+        <div class="modal-body">
+          <table class="table">
+            <thead>
+            <tr>
+              <th>{{ 'Score'|t }}</th>
+              <th>{{ 'Created'|t }}</th>
+              <th>{{ 'Elapsed Hr'|t }}</th>
+              <th>{{ 'Last Reviewed'|t }}</th>
+            </tr>
+            </thead>
+            {% for snapshot in modal_snapshot.snapshots %}
+              {# {{ dd(snapshot) }} #}
+              {% set hour = (snapshot.elapsed_min > 240) ? '4+ HR' : snapshot.elapsed_hour %}
+              {% set mins = (snapshot.elapsed_sec > 30) ? snapshot.elapsed_min + 1 : snapshot.elapsed_min %}
+
+              <tr data-id="{{ snapshot.resultId }}">
+                <td>{{ snapshot.score_attempted|number_format(3) * 100 }}%
+                  ({{ snapshot.correct }} / {{ snapshot.attempted }})
+                  <div class="progress progress-striped active">
+                    <div
+                      class="progress-bar progress-bar-striped progress-bar-animated progress-bar-primary  {{ modal_snapshot.progress_bg }}"
+                      role="progressbar"
+                      style="width:{{ snapshot.score_attempted|number_format(3) * 100 }}%;display: block; float: left;"
+                      aria-valuenow="{{ snapshot.score_attempted|number_format(3) * 100 }}"
+                      aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                  </div>
+                </td>
+                <td>{{ snapshot.created|date('m-d-Y') }}</td>
+
+                {% if hour != 0 %}
+                  <td>{{ hour }} hr {{ mins }} min</td>
+                {% elseif mins == 0 %}
+                  <td>{{ snapshot.elapsed_sec }} sec</td>
+                {% else %}
+                  <td>{{ mins }} min</td>
+                {% endif %}
+
+
+                {% if snapshot.reviewed %}
+                  <td>{{ snapshot.reviewed|date('m-d-Y') }}</td>
+                {% else %}
+                  <td>-</td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <button type="button" class="btn btn-info btn-md" data-dismiss="modal"
+                aria-label="{{ 'Close'|t }}">{{ 'CLOSE'|t }}</button>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+{# End Modal #}

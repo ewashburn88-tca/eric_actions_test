@@ -1,0 +1,21 @@
+uuid: 28428994-c7a0-48d0-9b53-47854c69dd34
+langcode: en
+status: true
+dependencies:
+  module:
+    - bricks
+    - taxonomy
+    - user
+id: taxonomy_term.field_students
+field_name: field_students
+entity_type: taxonomy_term
+type: bricks
+settings:
+  target_type: user
+module: bricks
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,5 @@
+administer qwsimplechoice:
+  title: 'Administer Simple Choice Question Module'
+
+view qwsimplechoice questions:
+  title: 'View Simple Choice Questions'

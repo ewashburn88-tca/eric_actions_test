@@ -1,0 +1,33 @@
+toolbar:
+  version: 'VERSION'
+  css:
+    theme:
+      css/toolbar.icons.theme.css: {}
+  dependencies:
+    - 'toolbar/toolbar'
+
+qwiz_take_form:
+  version: VERSION
+  css:
+    state:
+      assets/css/qwizard.qwiz_take_form.state.css: {}
+    layout:
+      assets/css/qwizard.qwiz_take_form.layout.css: {}
+    theme:
+      assets/css/qwizard.qwiz_take_form.theme.css: {}
+  js:
+    assets/js/qwizard.qwiz_take_form.js: {}
+
+
+
+qwiz_results:
+  version: VERSION
+  css:
+    state:
+      assets/css/qwizard.qwiz_results.state.css: {}
+    layout:
+      assets/css/qwizard.qwiz_results.layout.css: {}
+    theme:
+      assets/css/qwizard.qwiz_results.theme.css: {}
+  js:
+    assets/js/qwizard.qwiz_results.js: {}

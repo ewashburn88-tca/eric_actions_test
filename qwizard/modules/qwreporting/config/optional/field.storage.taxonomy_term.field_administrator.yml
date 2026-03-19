@@ -1,0 +1,21 @@
+uuid: ab9c1f39-c8af-4026-9b07-9036ac6cc8ae
+langcode: en
+status: true
+dependencies:
+  module:
+    - bricks
+    - taxonomy
+    - user
+id: taxonomy_term.field_administrator
+field_name: field_administrator
+entity_type: taxonomy_term
+type: bricks
+settings:
+  target_type: user
+module: bricks
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

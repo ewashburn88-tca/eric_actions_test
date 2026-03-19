@@ -1,0 +1,16 @@
+services:
+  qwcommerce.membership_manager:
+    class: Drupal\qwcommerce\MembershipManager
+    arguments: ['@entity_type.manager', '@logger.factory', '@messenger', '@qwizard.membership', '@qwsubs.subscription_handler', '@qwizard.coursehandler']
+
+  qwcommerce.order_subscriber:
+    class: Drupal\qwcommerce\EventSubscriber\OrderSubscriber
+    arguments: ['@request_stack', '@current_user', '@plugin.manager.mail', '@logger.factory', '@qwcommerce.membership_manager']
+    tags:
+      - { name: event_subscriber }
+
+  qwcommerce.cart_subscriber:
+    class: Drupal\qwcommerce\EventSubscriber\QwCommerceCartSubscriber
+    arguments: [ '@entity_type.manager', '@current_user', '@qwizard.membership' ]
+    tags:
+      - { name: event_subscriber }

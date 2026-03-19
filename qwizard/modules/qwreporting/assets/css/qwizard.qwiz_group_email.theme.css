@@ -1,0 +1,31 @@
+.table.group-email-table-options.small {
+  font-size: 75%;
+}
+
+.table.group-email-table-options th,
+.table.group-email-table-options td {
+  padding: 0.35rem 0.25rem;
+}
+
+.table.group-email-table-options .custom-switch {
+  padding: 0;
+  min-width: 24px;
+}
+
+.table.group-email-table-options input[type="checkbox"].custom-control-input {
+  position: relative;
+  opacity: 1;
+  top: 3px;
+  z-index: 99;
+  left: 50%;
+  margin-left: -8px;
+}
+
+.table.group-email-table-options th.select-all input[type="checkbox"] {
+  position: relative;
+  top: 2px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+}

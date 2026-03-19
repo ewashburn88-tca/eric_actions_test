@@ -1,0 +1,43 @@
+uuid: 44a74f90-49c0-4952-b150-638cb53a3036
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_administrator
+    - taxonomy.vocabulary.associations
+  module:
+    - bricks
+id: taxonomy_term.associations.field_administrator
+field_name: field_administrator
+entity_type: taxonomy_term
+bundle: associations
+label: Administrator
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: true
+    filter:
+      type: role
+      role:
+        association_admin: association_admin
+        administrator: '0'
+        navle: '0'
+        bcse: '0'
+        vtne: '0'
+        navle_premium: '0'
+        bcse_premium: '0'
+        manager: '0'
+        editor: '0'
+        staff: '0'
+        organizer: '0'
+        answer_key: '0'
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: bricks

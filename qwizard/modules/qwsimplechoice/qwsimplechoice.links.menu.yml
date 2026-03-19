@@ -1,0 +1,7 @@
+qwsimplechoice.qwsimplechoice_config_form:
+  title: 'Question Simple Choice Config'
+  route_name: qwsimplechoice.qwsimplechoice_config_form
+  description: 'Administer Quiz Wizard Simple Choice Question module.'
+  parent: qwizard.admin_qwizard.configuration
+  weight: 99
+

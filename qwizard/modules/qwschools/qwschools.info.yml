@@ -1,0 +1,7 @@
+name: 'qwschools'
+type: module
+description: 'Provides a school entity type'
+core_version_requirement: ^9.2
+package: 'Education'
+dependencies:
+  - qwizard
