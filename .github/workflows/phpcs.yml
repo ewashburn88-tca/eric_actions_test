@@ -1,1 +1,17 @@
-#todo
+name: Run PHPCS Script
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run PHPCS script
+        run: ./scripts/phpcs_run.sh
